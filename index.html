@@ -1,83 +1,122 @@
 <!doctype html>
 <html lang="pt-PT">
 <head>
-  <!-- Define a codificação para permitir acentos, símbolos e texto português. -->
+  <!-- Define a codificação para aceitar acentos e caracteres técnicos. -->
   <meta charset="utf-8" />
 
   <!-- Faz a app adaptar-se ao ecrã do telemóvel. -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Define a cor principal usada pelo browser quando a PWA é instalada. -->
-  <meta name="theme-color" content="#111827" />
+  <!-- Define a cor principal da PWA quando instalada. -->
+  <meta name="theme-color" content="#0f172a" />
 
-  <!-- Liga o manifesto PWA para permitir instalação no ecrã principal. -->
+  <!-- Liga o manifesto para permitir instalação no ecrã principal. -->
   <link rel="manifest" href="./manifest.json" />
 
-  <!-- Define o título da aplicação no browser. -->
-  <title>ATL Extractor V1.1</title>
+  <!-- Define o título visível no browser. -->
+  <title>ATL Extractor V1.2</title>
 
-  <!-- Carrega o Tesseract.js para fazer OCR gratuito no browser. -->
+  <!-- Carrega o Tesseract.js para OCR gratuito no browser. -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <style>
-    /* Define a base visual da aplicação. */
+    /* Define variáveis visuais usadas em toda a app. */
     :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --dark: #0f172a;
+      --line: #e5e7eb;
+      --green: #22c55e;
+      --red: #991b1b;
+      --blue: #2563eb;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: #111827;
-      background: #f3f4f6;
+      color: var(--text);
+      background: var(--bg);
     }
 
     /* Remove margens padrão do browser. */
     body {
       margin: 0;
-      background: #f3f4f6;
+      background: var(--bg);
     }
 
-    /* Limita a largura da aplicação para ficar legível também em desktop. */
+    /* Cria a área principal da aplicação. */
     .app {
-      max-width: 1180px;
+      max-width: 1220px;
       margin: 0 auto;
       padding: 14px;
     }
 
-    /* Estiliza o cabeçalho principal. */
+    /* Define o cabeçalho principal. */
     header {
-      background: #111827;
+      background: var(--dark);
       color: white;
       padding: 16px;
       border-radius: 16px;
       margin-bottom: 14px;
     }
 
-    /* Ajusta o título principal. */
+    /* Ajusta o título. */
     h1 {
       margin: 0 0 6px;
       font-size: 1.35rem;
     }
 
-    /* Ajusta subtítulos de cartões. */
+    /* Ajusta títulos de secção. */
     h2 {
       margin: 0 0 8px;
       font-size: 1.1rem;
     }
 
-    /* Mostra texto secundário com menor contraste. */
+    /* Mostra subtítulo discreto no cabeçalho. */
     .subtitle {
       margin: 0;
-      color: #d1d5db;
+      color: #cbd5e1;
       font-size: 0.95rem;
     }
 
-    /* Cria cartões brancos para separar as secções. */
+    /* Cria cartões brancos para organizar o conteúdo. */
     .card {
-      background: white;
+      background: var(--card);
       border-radius: 16px;
       padding: 14px;
       margin-bottom: 14px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
-    /* Organiza botões e controlos na mesma linha quando possível. */
+    /* Mostra texto auxiliar em cinzento. */
+    .note {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.35;
+      margin: 6px 0 10px;
+    }
+
+    /* Destaca uma explicação importante sem bloquear a leitura. */
+    .hint {
+      background: #ecfdf5;
+      color: #064e3b;
+      border: 1px solid #bbf7d0;
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      margin: 8px 0;
+    }
+
+    /* Mostra avisos ou erros num tom vermelho claro. */
+    .errorBox {
+      background: #fee2e2;
+      color: #7f1d1d;
+      border: 1px solid #fecaca;
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      margin-top: 8px;
+    }
+
+    /* Organiza botões com quebra de linha. */
     .actions {
       display: flex;
       flex-wrap: wrap;
@@ -86,36 +125,36 @@
       margin-top: 10px;
     }
 
-    /* Estiliza botões principais. */
+    /* Define o estilo base dos botões. */
     button {
       border: 0;
       border-radius: 10px;
       padding: 10px 13px;
-      background: #111827;
+      background: var(--dark);
       color: white;
       font-weight: 650;
       cursor: pointer;
     }
 
-    /* Estiliza botões secundários. */
+    /* Define botões secundários. */
     button.secondary {
       background: #e5e7eb;
-      color: #111827;
+      color: var(--text);
     }
 
-    /* Estiliza botões de perigo para remover dados. */
+    /* Define botões de acção destrutiva. */
     button.danger {
-      background: #991b1b;
+      background: var(--red);
       color: white;
     }
 
-    /* Mostra botões desactivados com menor opacidade. */
+    /* Mostra botões indisponíveis com menor opacidade. */
     button:disabled {
       opacity: 0.45;
       cursor: not-allowed;
     }
 
-    /* Define aparência comum dos campos. */
+    /* Define inputs, selects e textareas. */
     input, textarea, select {
       width: 100%;
       box-sizing: border-box;
@@ -126,74 +165,107 @@
       background: white;
     }
 
-    /* Dá altura útil ao texto OCR. */
+    /* Dá altura útil ao texto OCR bruto. */
     textarea {
-      min-height: 130px;
+      min-height: 110px;
       resize: vertical;
       white-space: pre-wrap;
     }
 
-    /* Mostra notas auxiliares com contraste reduzido. */
-    .note {
-      color: #4b5563;
-      font-size: 0.92rem;
-      line-height: 1.35;
-      margin: 6px 0 10px;
-    }
-
-    /* Mostra avisos curtos em destaque. */
-    .warning {
-      background: #fffbeb;
-      color: #78350f;
-      border: 1px solid #fde68a;
-      padding: 10px;
-      border-radius: 12px;
-      font-size: 0.92rem;
-      margin-top: 8px;
-    }
-
-    /* Mostra mensagens de estado do sistema. */
-    .status {
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: #eef2ff;
-      color: #312e81;
-      margin-top: 10px;
-      font-size: 0.95rem;
-      display: none;
-    }
-
-    /* Mostra erros em vermelho. */
-    .error {
-      background: #fee2e2;
-      color: #7f1d1d;
-    }
-
-    /* Cria uma grelha responsiva para campos. */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    /* Em telemóveis, coloca a grelha numa única coluna. */
-    @media (max-width: 760px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Define labels legíveis. */
+    /* Define labels claros. */
     label {
       display: block;
       font-weight: 650;
       margin-bottom: 6px;
     }
 
-    /* Cria uma área com scroll horizontal para a tabela. */
+    /* Grelha responsiva para campos e ajustes. */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    /* Em telemóveis, a grelha passa a uma coluna. */
+    @media (max-width: 820px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cria uma zona de vídeo com moldura. */
+    .cameraBox {
+      position: relative;
+      background: #020617;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #d1d5db;
+      min-height: 220px;
+    }
+
+    /* Faz o vídeo ocupar a largura disponível. */
+    #cameraVideo {
+      width: 100%;
+      display: none;
+      background: #020617;
+    }
+
+    /* Mostra a moldura de enquadramento sobre o vídeo. */
+    .frameOverlay {
+      position: absolute;
+      left: 6%;
+      right: 6%;
+      top: 13%;
+      bottom: 13%;
+      border: 3px solid var(--green);
+      border-radius: 12px;
+      box-shadow: 0 0 0 9999px rgba(0,0,0,0.34);
+      pointer-events: none;
+      display: none;
+    }
+
+    /* Mostra uma legenda curta dentro da moldura. */
+    .frameLabel {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      background: rgba(15, 23, 42, 0.82);
+      color: white;
+      padding: 6px 9px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+
+    /* Cria a área de preview da folha capturada. */
+    .previewBox {
+      position: relative;
+      overflow: auto;
+      background: #020617;
+      border-radius: 14px;
+      border: 1px solid #d1d5db;
+      margin-top: 10px;
+      max-height: 70vh;
+    }
+
+    /* Define o canvas de preview da folha. */
+    #sheetCanvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      background: #020617;
+    }
+
+    /* Mostra uma legenda pequena por baixo de elementos. */
+    .mini {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* Cria área rolável para tabela larga. */
     .table-wrap {
       overflow-x: auto;
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--line);
       border-radius: 12px;
     }
 
@@ -205,29 +277,29 @@
       background: white;
     }
 
-    /* Estiliza células da tabela. */
+    /* Define células da tabela. */
     th, td {
-      border-bottom: 1px solid #e5e7eb;
-      border-right: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
       padding: 6px;
       text-align: left;
       vertical-align: top;
       font-size: 0.88rem;
     }
 
-    /* Dá fundo claro ao cabeçalho da tabela. */
+    /* Define cabeçalho da tabela. */
     th {
       background: #f9fafb;
       font-weight: 700;
       white-space: nowrap;
     }
 
-    /* Remove a borda direita na última célula. */
+    /* Remove borda final da tabela. */
     th:last-child, td:last-child {
       border-right: 0;
     }
 
-    /* Faz inputs da tabela ocuparem a célula inteira. */
+    /* Faz inputs da tabela ocuparem a célula. */
     td input {
       border: 0;
       border-radius: 6px;
@@ -235,185 +307,191 @@
       background: #f9fafb;
     }
 
-    /* Cria a área da imagem com canvas e overlay. */
-    .image-stage {
-      position: relative;
-      width: 100%;
-      max-height: 72vh;
-      overflow: auto;
-      border-radius: 12px;
-      background: #111827;
-      border: 1px solid #d1d5db;
+    /* Assinala células preenchidas automaticamente. */
+    td input.autoFilled {
+      background: #eff6ff;
+      outline: 1px solid #bfdbfe;
+    }
+
+    /* Define a caixa de estado. */
+    .status {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #eef2ff;
+      color: #312e81;
       margin-top: 10px;
-      touch-action: none;
-    }
-
-    /* Define o canvas onde a foto é desenhada. */
-    #imageCanvas {
-      display: block;
-      max-width: 100%;
-      height: auto;
-      cursor: crosshair;
-    }
-
-    /* Define o rectângulo visual de selecção por zona. */
-    #selectionBox {
-      position: absolute;
-      border: 2px solid #22c55e;
-      background: rgba(34, 197, 94, 0.15);
+      font-size: 0.95rem;
       display: none;
-      pointer-events: none;
-      box-sizing: border-box;
     }
 
-    /* Organiza controlos pequenos lado a lado. */
-    .controls-row {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
+    /* Define estado de erro. */
+    .status.error {
+      background: #fee2e2;
+      color: #7f1d1d;
     }
 
-    /* Ajusta controlos em telemóvel. */
-    @media (max-width: 900px) {
-      .controls-row {
-        grid-template-columns: 1fr;
-      }
+    /* Define barra de progresso. */
+    .progressWrap {
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+      display: none;
     }
 
-    /* Define o estilo do resultado JSON. */
+    /* Define a barra interior de progresso. */
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      background: var(--blue);
+      transition: width 0.2s ease;
+    }
+
+    /* Define o bloco JSON. */
     pre {
       margin: 0;
       padding: 12px;
-      background: #111827;
+      background: var(--dark);
       color: #e5e7eb;
       border-radius: 12px;
       overflow: auto;
       min-height: 150px;
     }
 
-    /* Define uma linha discreta para dados auxiliares. */
-    .mini {
-      font-size: 0.85rem;
-      color: #6b7280;
+    /* Define pequenas cápsulas de informação. */
+    .pill {
+      display: inline-block;
+      background: #e5e7eb;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      margin-right: 4px;
+      margin-top: 4px;
     }
 
-    /* Garante que código inline não fica com tamanho excessivo. */
+    /* Torna código inline mais legível. */
     code {
       font-size: 0.9em;
     }
   </style>
 </head>
 <body>
-  <!-- Container principal da PWA. -->
+  <!-- Container principal da app. -->
   <main class="app">
-    <!-- Cabeçalho da aplicação. -->
+    <!-- Cabeçalho com identificação da versão. -->
     <header>
-      <h1>ATL Extractor V1.1</h1>
-      <p class="subtitle">Versão com OCR por zona: selecciona uma célula da foto, escolhe o campo e preenche a tabela.</p>
+      <h1>ATL Extractor V1.2</h1>
+      <p class="subtitle">Modo prático: enquadras a folha, capturas, e a app tenta preencher a tabela automaticamente.</p>
     </header>
 
-    <!-- Aviso sobre a limitação do OCR gratuito em escrita manual. -->
+    <!-- Explicação curta do novo fluxo. -->
     <section class="card">
-      <h2>Nota operacional</h2>
+      <h2>Fluxo desta versão</h2>
       <p class="note">
-        A leitura da folha inteira gera muitos erros porque há escrita manual, sombras, grelhas e texto impresso.
-        Esta versão deixa-te seleccionar zonas pequenas da imagem para reduzir ruído.
+        A versão anterior obrigava a seleccionar célula por célula. Esta usa um template fixo da folha:
+        capturas a folha dentro da moldura, ajustas o template se necessário, carregas em extrair e confirmas a tabela.
       </p>
-      <div class="warning">
-        Para melhores resultados: amplia a foto, selecciona só a célula pretendida e confirma sempre os valores antes de gerar JSON.
+      <div class="hint">
+        O melhor resultado vem de uma foto tirada de cima, com a folha bem centrada na moldura verde e sem sombras fortes.
       </div>
+      <span class="pill">1 foto</span>
+      <span class="pill">1 extracção</span>
+      <span class="pill">tabela editável</span>
+      <span class="pill">JSON final</span>
     </section>
 
-    <!-- Secção de imagem e OCR por zona. -->
+    <!-- Secção de captura por câmara ou upload. -->
     <section class="card">
-      <h2>1. Foto e OCR por zona</h2>
+      <h2>1. Capturar folha</h2>
 
-      <!-- Input para tirar ou carregar fotografia. -->
-      <input id="photoInput" type="file" accept="image/*" capture="environment" />
-
-      <!-- Controlos para escolher o destino do OCR. -->
-      <div class="controls-row" style="margin-top: 12px;">
-        <div>
-          <label for="targetField">Campo a preencher</label>
-          <select id="targetField"></select>
-        </div>
-
-        <div>
-          <label for="ocrMode">Tipo de OCR</label>
-          <select id="ocrMode">
-            <option value="auto">Automático</option>
-            <option value="time">Hora</option>
-            <option value="number">Número</option>
-            <option value="station">Estação</option>
-            <option value="text">Texto</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="preprocessMode">Pré-processamento</label>
-          <select id="preprocessMode">
-            <option value="strong">Forte</option>
-            <option value="medium">Médio</option>
-            <option value="none">Nenhum</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="zoomLevel">Zoom</label>
-          <select id="zoomLevel">
-            <option value="1">100%</option>
-            <option value="1.5">150%</option>
-            <option value="2">200%</option>
-            <option value="2.5">250%</option>
-          </select>
+      <!-- Área de câmara com moldura visual. -->
+      <div class="cameraBox">
+        <video id="cameraVideo" autoplay playsinline muted></video>
+        <div id="frameOverlay" class="frameOverlay">
+          <div class="frameLabel">Alinha a folha dentro desta moldura</div>
         </div>
       </div>
 
-      <!-- Botões para OCR da selecção ou folha completa. -->
+      <!-- Botões de câmara. -->
       <div class="actions">
-        <button id="ocrSelectionBtn" disabled>OCR da selecção</button>
-        <button id="ocrFullBtn" class="secondary" disabled>OCR folha inteira</button>
-        <button id="clearSelectionBtn" class="secondary" disabled>Limpar selecção</button>
-        <button id="clearAllBtn" class="danger">Limpar tudo</button>
+        <button id="startCameraBtn">Iniciar câmara</button>
+        <button id="captureBtn" class="secondary" disabled>Capturar</button>
+        <button id="stopCameraBtn" class="secondary" disabled>Parar câmara</button>
       </div>
+
+      <!-- Upload como alternativa ao getUserMedia. -->
+      <p class="note">Alternativa: carregar uma foto já tirada.</p>
+      <input id="photoInput" type="file" accept="image/*" capture="environment" />
 
       <!-- Mensagem de estado. -->
       <div id="status" class="status"></div>
 
-      <!-- Área visual onde o utilizador selecciona a zona da imagem. -->
-      <div class="image-stage" id="imageStage">
-        <canvas id="imageCanvas"></canvas>
-        <div id="selectionBox"></div>
+      <!-- Barra de progresso. -->
+      <div id="progressWrap" class="progressWrap">
+        <div id="progressBar"></div>
       </div>
-
-      <!-- Texto auxiliar com instrução curta. -->
-      <p class="mini">
-        Arrasta sobre a célula pretendida. Em telemóvel, usa o dedo para marcar o rectângulo.
-      </p>
     </section>
 
-    <!-- Secção com OCR bruto e limpeza manual. -->
+    <!-- Secção de preview e ajuste de template. -->
     <section class="card">
-      <h2>2. Texto OCR bruto</h2>
+      <h2>2. Confirmar enquadramento</h2>
       <p class="note">
-        O texto aparece aqui depois de cada OCR. Podes copiar, corrigir ou usar como referência.
+        As caixas azuis indicam as zonas que serão lidas. Se as caixas não baterem certo com a folha, ajusta X/Y/escala antes de extrair.
       </p>
 
-      <!-- Caixa de texto com o último resultado OCR. -->
-      <textarea id="ocrText" placeholder="Resultado OCR..."></textarea>
-
-      <!-- Botões para aplicar o texto ao campo seleccionado. -->
-      <div class="actions">
-        <button id="applyTextBtn" class="secondary">Aplicar texto ao campo escolhido</button>
-        <button id="cleanTextBtn" class="secondary">Limpar texto OCR</button>
+      <!-- Ajustes globais do template. -->
+      <div class="grid">
+        <div>
+          <label for="offsetX">Deslocação X</label>
+          <input id="offsetX" type="range" min="-8" max="8" step="0.5" value="0" />
+        </div>
+        <div>
+          <label for="offsetY">Deslocação Y</label>
+          <input id="offsetY" type="range" min="-8" max="8" step="0.5" value="0" />
+        </div>
+        <div>
+          <label for="scaleX">Escala X</label>
+          <input id="scaleX" type="range" min="92" max="108" step="1" value="100" />
+        </div>
+        <div>
+          <label for="scaleY">Escala Y</label>
+          <input id="scaleY" type="range" min="92" max="108" step="1" value="100" />
+        </div>
       </div>
+
+      <!-- Botões de extracção. -->
+      <div class="actions">
+        <button id="extractAllBtn" disabled>Extrair tudo</button>
+        <button id="extractLeg1Btn" class="secondary" disabled>Extrair Leg 1</button>
+        <button id="extractLeg2Btn" class="secondary" disabled>Extrair Leg 2</button>
+        <button id="extractLeg3Btn" class="secondary" disabled>Extrair Leg 3</button>
+        <button id="extractLeg4Btn" class="secondary" disabled>Extrair Leg 4</button>
+        <button id="resetTemplateBtn" class="secondary">Repor template</button>
+      </div>
+
+      <!-- Preview da folha capturada e das zonas OCR. -->
+      <div class="previewBox">
+        <canvas id="sheetCanvas"></canvas>
+      </div>
+
+      <!-- Texto auxiliar sobre o overlay. -->
+      <p class="mini">Azul = campos OCR. Verde = technical log serial number.</p>
+    </section>
+
+    <!-- Secção de texto OCR bruto. -->
+    <section class="card">
+      <h2>3. Último OCR bruto</h2>
+      <p class="note">
+        Esta caixa serve para diagnóstico. O valor final deve ser confirmado na tabela.
+      </p>
+      <textarea id="ocrText" placeholder="Último texto OCR..."></textarea>
     </section>
 
     <!-- Secção dos dados gerais. -->
     <section class="card">
-      <h2>3. Dados gerais</h2>
-
-      <!-- Campos que pertencem à folha inteira. -->
+      <h2>4. Dados gerais</h2>
       <div class="grid">
         <div>
           <label for="technicalLogSerialNumber">Technical Log Serial Number</label>
@@ -424,9 +502,9 @@
 
     <!-- Secção da tabela editável. -->
     <section class="card">
-      <h2>4. Tabela editável</h2>
+      <h2>5. Tabela editável</h2>
       <p class="note">
-        A OCR só ajuda a preencher. A confirmação manual continua a ser obrigatória.
+        Os campos em azul claro foram preenchidos por OCR. Corrige tudo o que estiver errado antes de gerar o JSON.
       </p>
 
       <!-- Tabela com scroll horizontal. -->
@@ -450,15 +528,14 @@
               <th>Acção</th>
             </tr>
           </thead>
-
-          <!-- Corpo da tabela criado por JavaScript. -->
           <tbody id="legsTableBody"></tbody>
         </table>
       </div>
 
-      <!-- Botões da tabela e JSON. -->
+      <!-- Botões para gestão da tabela e JSON. -->
       <div class="actions">
         <button id="addLegBtn" class="secondary">Adicionar leg</button>
+        <button id="clearTableBtn" class="secondary">Limpar tabela</button>
         <button id="generateJsonBtn">Confirmar e gerar JSON</button>
         <button id="copyJsonBtn" class="secondary" disabled>Copiar JSON</button>
         <button id="downloadJsonBtn" class="secondary" disabled>Descarregar JSON</button>
@@ -467,79 +544,122 @@
 
     <!-- Secção do JSON final. -->
     <section class="card">
-      <h2>5. JSON final</h2>
+      <h2>6. JSON final</h2>
       <pre id="jsonOutput">{}</pre>
     </section>
   </main>
 
   <script>
-    // Guarda a imagem original carregada pelo utilizador.
-    let originalImage = null;
+    // Guarda o stream da câmara enquanto está activa.
+    let cameraStream = null;
 
-    // Guarda a escala actual usada no canvas.
-    let currentScale = 1;
+    // Guarda o canvas interno da folha capturada, usado para OCR.
+    let capturedSheetCanvas = null;
 
-    // Guarda a selecção actual em coordenadas do canvas.
-    let selection = null;
+    // Guarda a imagem da folha para redesenhar o preview com overlays.
+    let capturedSheetImage = null;
 
-    // Indica se o utilizador está a arrastar uma selecção.
-    let isSelecting = false;
-
-    // Guarda o ponto inicial da selecção.
-    let selectionStart = { x: 0, y: 0 };
-
-    // Guarda o URL do Blob usado para descarregar o JSON.
+    // Guarda o URL temporário para descarregar JSON.
     let currentJsonBlobUrl = null;
 
-    // Selecciona elementos do DOM usados pela aplicação.
+    // Guarda que campos foram preenchidos automaticamente por OCR.
+    const autoFilled = new Set();
+
+    // Selecciona elementos principais do DOM.
+    const cameraVideo = document.getElementById("cameraVideo");
+    const frameOverlay = document.getElementById("frameOverlay");
+    const startCameraBtn = document.getElementById("startCameraBtn");
+    const captureBtn = document.getElementById("captureBtn");
+    const stopCameraBtn = document.getElementById("stopCameraBtn");
     const photoInput = document.getElementById("photoInput");
-    const imageStage = document.getElementById("imageStage");
-    const imageCanvas = document.getElementById("imageCanvas");
-    const selectionBox = document.getElementById("selectionBox");
-    const targetField = document.getElementById("targetField");
-    const ocrMode = document.getElementById("ocrMode");
-    const preprocessMode = document.getElementById("preprocessMode");
-    const zoomLevel = document.getElementById("zoomLevel");
-    const ocrSelectionBtn = document.getElementById("ocrSelectionBtn");
-    const ocrFullBtn = document.getElementById("ocrFullBtn");
-    const clearSelectionBtn = document.getElementById("clearSelectionBtn");
-    const clearAllBtn = document.getElementById("clearAllBtn");
     const statusBox = document.getElementById("status");
+    const progressWrap = document.getElementById("progressWrap");
+    const progressBar = document.getElementById("progressBar");
+    const sheetCanvas = document.getElementById("sheetCanvas");
+    const offsetX = document.getElementById("offsetX");
+    const offsetY = document.getElementById("offsetY");
+    const scaleX = document.getElementById("scaleX");
+    const scaleY = document.getElementById("scaleY");
+    const extractAllBtn = document.getElementById("extractAllBtn");
+    const extractLeg1Btn = document.getElementById("extractLeg1Btn");
+    const extractLeg2Btn = document.getElementById("extractLeg2Btn");
+    const extractLeg3Btn = document.getElementById("extractLeg3Btn");
+    const extractLeg4Btn = document.getElementById("extractLeg4Btn");
+    const resetTemplateBtn = document.getElementById("resetTemplateBtn");
     const ocrText = document.getElementById("ocrText");
-    const applyTextBtn = document.getElementById("applyTextBtn");
-    const cleanTextBtn = document.getElementById("cleanTextBtn");
     const technicalLogSerialNumber = document.getElementById("technicalLogSerialNumber");
     const legsTableBody = document.getElementById("legsTableBody");
     const addLegBtn = document.getElementById("addLegBtn");
+    const clearTableBtn = document.getElementById("clearTableBtn");
     const generateJsonBtn = document.getElementById("generateJsonBtn");
     const copyJsonBtn = document.getElementById("copyJsonBtn");
     const downloadJsonBtn = document.getElementById("downloadJsonBtn");
     const jsonOutput = document.getElementById("jsonOutput");
 
-    // Obtém o contexto 2D do canvas para desenhar e processar a imagem.
-    const ctx = imageCanvas.getContext("2d", { willReadFrequently: true });
+    // Obtém o contexto do canvas de preview.
+    const sheetCtx = sheetCanvas.getContext("2d", { willReadFrequently: true });
 
-    // Define os campos por leg e os respectivos placeholders.
+    // Define a proporção aproximada da área da folha dentro da moldura.
+    const FRAME_RATIO = 1.62;
+
+    // Define os campos por leg que aparecem na tabela e no JSON final.
     const legFields = [
-      { key: "leg", label: "Leg", placeholder: "1", kind: "number" },
-      { key: "refuel", label: "Refuel", placeholder: "222", kind: "number" },
-      { key: "depart", label: "Depart", placeholder: "260", kind: "number" },
-      { key: "arrival", label: "Arrival", placeholder: "260", kind: "number" },
-      { key: "station_departure", label: "Station Departure", placeholder: "BGC", kind: "station" },
-      { key: "station_arrival", label: "Station Arrival", placeholder: "NAL", kind: "station" },
-      { key: "off_blk", label: "Off BLK", placeholder: "13:15", kind: "time" },
-      { key: "atd", label: "A.T.D", placeholder: "13:30", kind: "time" },
-      { key: "ata", label: "A.T.A", placeholder: "13:40", kind: "time" },
-      { key: "on_blk", label: "On BLK", placeholder: "13:45", kind: "time" },
-      { key: "pax", label: "PAX", placeholder: "6", kind: "number" },
-      { key: "trans", label: "Trans", placeholder: "0", kind: "number" },
-      { key: "delay_code", label: "Delay Cod.", placeholder: "93", kind: "text" }
+      { key: "leg", label: "Leg", placeholder: "1" },
+      { key: "refuel", label: "Refuel", placeholder: "222" },
+      { key: "depart", label: "Depart", placeholder: "260" },
+      { key: "arrival", label: "Arrival", placeholder: "260" },
+      { key: "station_departure", label: "Station Departure", placeholder: "BGC" },
+      { key: "station_arrival", label: "Station Arrival", placeholder: "NAL" },
+      { key: "off_blk", label: "Off BLK", placeholder: "13:15" },
+      { key: "atd", label: "A.T.D", placeholder: "13:30" },
+      { key: "ata", label: "A.T.A", placeholder: "13:40" },
+      { key: "on_blk", label: "On BLK", placeholder: "13:45" },
+      { key: "pax", label: "PAX", placeholder: "6" },
+      { key: "trans", label: "Trans", placeholder: "0" },
+      { key: "delay_code", label: "Delay Cod.", placeholder: "93" }
     ];
 
-    // Cria quatro legs iniciais para corresponder ao uso mais comum da folha.
+    // Cria quatro legs iniciais.
     const legs = [createEmptyLeg(1), createEmptyLeg(2), createEmptyLeg(3), createEmptyLeg(4)];
 
-    // Regista o service worker para tornar a app instalável.
+    // Define a posição base das quatro legs no template da folha.
+    const legBaseY = [0.158, 0.256, 0.354, 0.452];
+
+    // Define o template aproximado das zonas OCR, em percentagem da folha capturada.
+    // x/y/w/h usam valores entre 0 e 1 para resistir a resoluções diferentes.
+    const templateZones = [
+      { id: "technical_log_serial_number", label: "Serial", kind: "number", x: 0.735, y: 0.010, w: 0.115, h: 0.070, color: "#22c55e" }
+    ];
+
+    // Acrescenta zonas para cada leg e cada campo pretendido.
+    for (let i = 0; i < 4; i++) {
+      // Guarda a posição vertical base da leg.
+      const y = legBaseY[i];
+
+      // Define o número da leg como valor fixo, não OCR.
+      templateZones.push({ id: `leg_${i}_refuel`, label: `L${i + 1} Refuel`, kind: "number", x: 0.108, y: y + 0.000, w: 0.070, h: 0.028, color: "#2563eb" });
+      templateZones.push({ id: `leg_${i}_depart`, label: `L${i + 1} Depart`, kind: "number", x: 0.108, y: y + 0.028, w: 0.070, h: 0.028, color: "#2563eb" });
+      templateZones.push({ id: `leg_${i}_arrival`, label: `L${i + 1} Arrival`, kind: "number", x: 0.108, y: y + 0.056, w: 0.070, h: 0.028, color: "#2563eb" });
+
+      // Define zonas de estação e tempos de partida.
+      templateZones.push({ id: `leg_${i}_station_departure`, label: `L${i + 1} Dep Stn`, kind: "station", x: 0.245, y: y + 0.020, w: 0.075, h: 0.028, color: "#2563eb" });
+      templateZones.push({ id: `leg_${i}_off_blk`, label: `L${i + 1} Off`, kind: "time", x: 0.245, y: y + 0.047, w: 0.075, h: 0.028, color: "#2563eb" });
+      templateZones.push({ id: `leg_${i}_atd`, label: `L${i + 1} ATD`, kind: "time", x: 0.245, y: y + 0.074, w: 0.075, h: 0.028, color: "#2563eb" });
+
+      // Define zonas de estação e tempos de chegada.
+      templateZones.push({ id: `leg_${i}_station_arrival`, label: `L${i + 1} Arr Stn`, kind: "station", x: 0.330, y: y + 0.020, w: 0.075, h: 0.028, color: "#2563eb" });
+      templateZones.push({ id: `leg_${i}_ata`, label: `L${i + 1} ATA`, kind: "time", x: 0.330, y: y + 0.047, w: 0.075, h: 0.028, color: "#2563eb" });
+      templateZones.push({ id: `leg_${i}_on_blk`, label: `L${i + 1} On`, kind: "time", x: 0.330, y: y + 0.074, w: 0.075, h: 0.028, color: "#2563eb" });
+
+      // Define zonas de passageiros e trânsito.
+      templateZones.push({ id: `leg_${i}_pax`, label: `L${i + 1} PAX`, kind: "number", x: 0.523, y: y + 0.018, w: 0.035, h: 0.060, color: "#2563eb" });
+      templateZones.push({ id: `leg_${i}_trans`, label: `L${i + 1} Trans`, kind: "number", x: 0.558, y: y + 0.018, w: 0.035, h: 0.060, color: "#2563eb" });
+
+      // Define zona de delay code.
+      templateZones.push({ id: `leg_${i}_delay_code`, label: `L${i + 1} Delay`, kind: "text", x: 0.705, y: y + 0.012, w: 0.048, h: 0.075, color: "#2563eb" });
+    }
+
+    // Regista o service worker para PWA.
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("./sw.js").catch((error) => {
@@ -548,39 +668,8 @@
       });
     }
 
-    // Inicializa a tabela e a lista de campos quando a página carrega.
-    initialise();
-
-    // Faz a inicialização visual da app.
-    function initialise() {
-      populateTargetFieldOptions();
-      renderLegsTable();
-      setStatus("");
-    }
-
-    // Preenche o select de campos que podem receber OCR.
-    function populateTargetFieldOptions() {
-      targetField.innerHTML = "";
-
-      // Adiciona o campo global do serial number.
-      addTargetOption("technical_log_serial_number", "Technical Log Serial Number", "number");
-
-      // Adiciona todos os campos de cada leg.
-      legs.forEach((leg, legIndex) => {
-        legFields.forEach((field) => {
-          addTargetOption(`leg_${legIndex}_${field.key}`, `Leg ${legIndex + 1} · ${field.label}`, field.kind);
-        });
-      });
-    }
-
-    // Adiciona uma opção ao select de destino OCR.
-    function addTargetOption(value, label, kind) {
-      const option = document.createElement("option");
-      option.value = value;
-      option.textContent = label;
-      option.dataset.kind = kind;
-      targetField.appendChild(option);
-    }
+    // Inicializa a tabela ao abrir a app.
+    renderLegsTable();
 
     // Cria uma leg vazia.
     function createEmptyLeg(legNumber) {
@@ -601,6 +690,12 @@
       };
     }
 
+    // Converte texto vazio para null no JSON.
+    function emptyToNull(value) {
+      const clean = String(value ?? "").trim();
+      return clean === "" ? null : clean;
+    }
+
     // Mostra uma mensagem de estado.
     function setStatus(message, isError = false) {
       statusBox.textContent = message;
@@ -608,391 +703,385 @@
       statusBox.style.display = message ? "block" : "none";
     }
 
-    // Converte texto vazio em null para o JSON final.
-    function emptyToNull(value) {
-      const clean = String(value ?? "").trim();
-      return clean === "" ? null : clean;
+    // Actualiza a barra de progresso.
+    function setProgress(current, total) {
+      if (!total) {
+        progressWrap.style.display = "none";
+        progressBar.style.width = "0%";
+        return;
+      }
+
+      // Calcula percentagem inteira.
+      const pct = Math.round((current / total) * 100);
+
+      // Mostra e actualiza a barra.
+      progressWrap.style.display = "block";
+      progressBar.style.width = `${pct}%`;
     }
 
-    // Desenha a tabela a partir do array de legs.
-    function renderLegsTable() {
-      legsTableBody.innerHTML = "";
-
-      // Cria uma linha para cada leg.
-      legs.forEach((leg, index) => {
-        const row = document.createElement("tr");
-
-        // Cria um input para cada campo da leg.
-        legFields.forEach((field) => {
-          const cell = document.createElement("td");
-          const input = document.createElement("input");
-
-          // Define o valor actual do campo.
-          input.value = leg[field.key] ?? "";
-          input.placeholder = field.placeholder;
-          input.dataset.index = String(index);
-          input.dataset.field = field.key;
-
-          // Actualiza o modelo de dados quando o utilizador edita a célula.
-          input.addEventListener("input", (event) => {
-            const rowIndex = Number(event.target.dataset.index);
-            const key = event.target.dataset.field;
-            legs[rowIndex][key] = event.target.value;
-          });
-
-          // Adiciona o input à célula.
-          cell.appendChild(input);
-
-          // Adiciona a célula à linha.
-          row.appendChild(cell);
+    // Inicia a câmara traseira quando possível.
+    startCameraBtn.addEventListener("click", async () => {
+      try {
+        // Pede acesso à câmara traseira do dispositivo.
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          },
+          audio: false
         });
 
-        // Cria a célula de acção para remover a leg.
-        const actionCell = document.createElement("td");
-        const removeButton = document.createElement("button");
+        // Liga o stream ao elemento de vídeo.
+        cameraVideo.srcObject = cameraStream;
 
-        // Configura o botão de remoção da leg.
-        removeButton.textContent = "Remover";
-        removeButton.className = "secondary";
-        removeButton.type = "button";
+        // Mostra vídeo e moldura.
+        cameraVideo.style.display = "block";
+        frameOverlay.style.display = "block";
 
-        // Remove a leg e actualiza select/tabela.
-        removeButton.addEventListener("click", () => {
-          legs.splice(index, 1);
-          renderLegsTable();
-          populateTargetFieldOptions();
-        });
+        // Activa/desactiva botões adequados.
+        captureBtn.disabled = false;
+        stopCameraBtn.disabled = false;
+        startCameraBtn.disabled = true;
 
-        // Adiciona o botão à célula de acção.
-        actionCell.appendChild(removeButton);
+        // Mostra instrução.
+        setStatus("Câmara activa. Alinha a folha dentro da moldura verde e carrega em Capturar.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Não consegui abrir a câmara. Usa o carregamento de fotografia como alternativa.", true);
+      }
+    });
 
-        // Adiciona a célula de acção à linha.
-        row.appendChild(actionCell);
+    // Pára a câmara e liberta recursos.
+    stopCameraBtn.addEventListener("click", () => {
+      stopCamera();
+      setStatus("Câmara parada.");
+    });
 
-        // Adiciona a linha ao corpo da tabela.
-        legsTableBody.appendChild(row);
-      });
+    // Pára todos os tracks da câmara.
+    function stopCamera() {
+      if (cameraStream) {
+        // Interrompe cada track de vídeo activo.
+        cameraStream.getTracks().forEach((track) => track.stop());
+      }
+
+      // Limpa referência ao stream.
+      cameraStream = null;
+
+      // Limpa o vídeo.
+      cameraVideo.srcObject = null;
+
+      // Esconde vídeo e moldura.
+      cameraVideo.style.display = "none";
+      frameOverlay.style.display = "none";
+
+      // Reajusta botões.
+      captureBtn.disabled = true;
+      stopCameraBtn.disabled = true;
+      startCameraBtn.disabled = false;
     }
 
-    // Carrega a fotografia escolhida pelo utilizador.
+    // Captura a área da moldura verde a partir do vídeo.
+    captureBtn.addEventListener("click", () => {
+      if (!cameraVideo.videoWidth || !cameraVideo.videoHeight) {
+        setStatus("A câmara ainda não está pronta.", true);
+        return;
+      }
+
+      // Calcula a área da moldura em coordenadas visuais.
+      const videoRect = cameraVideo.getBoundingClientRect();
+      const frameRect = frameOverlay.getBoundingClientRect();
+
+      // Calcula factores entre dimensões visuais e reais do vídeo.
+      const scaleX = cameraVideo.videoWidth / videoRect.width;
+      const scaleY = cameraVideo.videoHeight / videoRect.height;
+
+      // Converte a moldura para coordenadas reais do vídeo.
+      const sourceX = Math.max(0, (frameRect.left - videoRect.left) * scaleX);
+      const sourceY = Math.max(0, (frameRect.top - videoRect.top) * scaleY);
+      const sourceW = Math.min(cameraVideo.videoWidth - sourceX, frameRect.width * scaleX);
+      const sourceH = Math.min(cameraVideo.videoHeight - sourceY, frameRect.height * scaleY);
+
+      // Cria canvas interno da folha.
+      capturedSheetCanvas = document.createElement("canvas");
+
+      // Define tamanho suficiente para OCR, mantendo proporção.
+      capturedSheetCanvas.width = 1800;
+      capturedSheetCanvas.height = Math.round(1800 / FRAME_RATIO);
+
+      // Desenha a zona da moldura no canvas interno.
+      const captureCtx = capturedSheetCanvas.getContext("2d", { willReadFrequently: true });
+      captureCtx.drawImage(
+        cameraVideo,
+        sourceX,
+        sourceY,
+        sourceW,
+        sourceH,
+        0,
+        0,
+        capturedSheetCanvas.width,
+        capturedSheetCanvas.height
+      );
+
+      // Carrega a imagem capturada no preview.
+      loadCapturedCanvas(capturedSheetCanvas);
+
+      // Pára a câmara após captura para poupar bateria.
+      stopCamera();
+
+      // Mostra estado final.
+      setStatus("Folha capturada. Confirma se as caixas azuis estão alinhadas e depois extrai.");
+    });
+
+    // Carrega fotografia escolhida pelo input.
     photoInput.addEventListener("change", () => {
       const file = photoInput.files && photoInput.files[0];
 
-      // Sai se o utilizador não escolheu ficheiro.
+      // Sai se não houver ficheiro.
       if (!file) {
         return;
       }
 
-      // Cria um FileReader para ler a imagem local.
+      // Cria leitor local de ficheiro.
       const reader = new FileReader();
 
-      // Quando a leitura termina, cria um objecto Image.
+      // Quando a leitura termina, cria imagem.
       reader.onload = () => {
         const img = new Image();
 
-        // Quando a imagem fica pronta, guarda e desenha no canvas.
+        // Quando a imagem está pronta, normaliza para canvas interno.
         img.onload = () => {
-          originalImage = img;
-          drawImageToCanvas();
-          ocrSelectionBtn.disabled = true;
-          ocrFullBtn.disabled = false;
-          clearSelectionBtn.disabled = true;
-          setStatus("Imagem carregada. Selecciona uma célula pequena e faz OCR da selecção.");
+          capturedSheetCanvas = document.createElement("canvas");
+
+          // Usa uma largura normalizada para OCR.
+          capturedSheetCanvas.width = 1800;
+
+          // Mantém a proporção da fotografia carregada.
+          capturedSheetCanvas.height = Math.round(1800 * (img.naturalHeight / img.naturalWidth));
+
+          // Desenha a foto no canvas interno.
+          const captureCtx = capturedSheetCanvas.getContext("2d", { willReadFrequently: true });
+          captureCtx.drawImage(img, 0, 0, capturedSheetCanvas.width, capturedSheetCanvas.height);
+
+          // Carrega o canvas no preview.
+          loadCapturedCanvas(capturedSheetCanvas);
+
+          // Mostra estado.
+          setStatus("Foto carregada. Se a folha não ocupa quase toda a imagem, a extracção será menos precisa.");
         };
 
-        // Define a origem da imagem com o conteúdo carregado.
+        // Define a origem da imagem.
         img.src = reader.result;
       };
 
-      // Inicia a leitura do ficheiro como Data URL.
+      // Lê o ficheiro como Data URL.
       reader.readAsDataURL(file);
     });
 
-    // Redesenha a imagem quando o zoom muda.
-    zoomLevel.addEventListener("change", () => {
-      if (!originalImage) {
-        return;
-      }
+    // Carrega o canvas interno no preview visível.
+    function loadCapturedCanvas(sourceCanvas) {
+      // Cria uma imagem a partir do canvas para facilitar redesenho.
+      capturedSheetImage = new Image();
 
-      // Redesenha a imagem com a nova escala.
-      drawImageToCanvas();
-
-      // Limpa a selecção antiga porque as coordenadas mudaram.
-      clearSelection();
-    });
-
-    // Desenha a imagem original no canvas com escala ajustada.
-    function drawImageToCanvas() {
-      if (!originalImage) {
-        return;
-      }
-
-      // Lê a escala escolhida pelo utilizador.
-      currentScale = Number(zoomLevel.value || "1");
-
-      // Calcula o tamanho final do canvas.
-      const width = Math.round(originalImage.naturalWidth * currentScale);
-      const height = Math.round(originalImage.naturalHeight * currentScale);
-
-      // Define as dimensões internas do canvas.
-      imageCanvas.width = width;
-      imageCanvas.height = height;
-
-      // Define o tamanho visual do canvas.
-      imageCanvas.style.width = `${width}px`;
-      imageCanvas.style.height = `${height}px`;
-
-      // Limpa o canvas antes de desenhar.
-      ctx.clearRect(0, 0, width, height);
-
-      // Desenha a imagem escalada.
-      ctx.drawImage(originalImage, 0, 0, width, height);
-    }
-
-    // Obtém coordenadas do rato/toque relativas ao canvas.
-    function getCanvasPoint(event) {
-      const rect = imageCanvas.getBoundingClientRect();
-
-      // Usa o primeiro toque quando o evento vem do telemóvel.
-      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-      const clientY = event.touches ? event.touches[0].clientY : event.clientY;
-
-      // Converte coordenadas visuais para coordenadas internas do canvas.
-      const x = (clientX - rect.left) * (imageCanvas.width / rect.width);
-      const y = (clientY - rect.top) * (imageCanvas.height / rect.height);
-
-      // Devolve ponto limitado aos limites do canvas.
-      return {
-        x: Math.max(0, Math.min(imageCanvas.width, x)),
-        y: Math.max(0, Math.min(imageCanvas.height, y))
+      // Quando a imagem está pronta, desenha preview.
+      capturedSheetImage.onload = () => {
+        drawPreviewWithZones();
+        enableExtractionButtons(true);
       };
+
+      // Define origem da imagem a partir do canvas.
+      capturedSheetImage.src = sourceCanvas.toDataURL("image/jpeg", 0.92);
     }
 
-    // Inicia a selecção quando o utilizador pressiona no canvas.
-    function startSelection(event) {
-      if (!originalImage) {
-        return;
-      }
-
-      // Evita scroll durante a selecção no telemóvel.
-      event.preventDefault();
-
-      // Marca que a selecção está activa.
-      isSelecting = true;
-
-      // Guarda o ponto inicial.
-      selectionStart = getCanvasPoint(event);
-
-      // Define uma selecção inicial com tamanho zero.
-      selection = { x: selectionStart.x, y: selectionStart.y, width: 0, height: 0 };
-
-      // Mostra a caixa de selecção.
-      updateSelectionBox();
+    // Activa ou desactiva todos os botões de extracção.
+    function enableExtractionButtons(enabled) {
+      extractAllBtn.disabled = !enabled;
+      extractLeg1Btn.disabled = !enabled;
+      extractLeg2Btn.disabled = !enabled;
+      extractLeg3Btn.disabled = !enabled;
+      extractLeg4Btn.disabled = !enabled;
     }
 
-    // Actualiza a selecção enquanto o utilizador arrasta.
-    function moveSelection(event) {
-      if (!isSelecting || !originalImage) {
-        return;
-      }
-
-      // Evita scroll durante a selecção no telemóvel.
-      event.preventDefault();
-
-      // Lê o ponto actual.
-      const point = getCanvasPoint(event);
-
-      // Calcula o rectângulo normalizado.
-      const x = Math.min(selectionStart.x, point.x);
-      const y = Math.min(selectionStart.y, point.y);
-      const width = Math.abs(point.x - selectionStart.x);
-      const height = Math.abs(point.y - selectionStart.y);
-
-      // Guarda a selecção actual.
-      selection = { x, y, width, height };
-
-      // Actualiza a caixa visual.
-      updateSelectionBox();
-    }
-
-    // Termina a selecção quando o utilizador larga o toque/rato.
-    function endSelection(event) {
-      if (!isSelecting) {
-        return;
-      }
-
-      // Evita comportamento padrão depois de seleccionar.
-      event.preventDefault();
-
-      // Marca que a selecção terminou.
-      isSelecting = false;
-
-      // Activa OCR se a selecção tiver tamanho útil.
-      if (selection && selection.width > 10 && selection.height > 10) {
-        ocrSelectionBtn.disabled = false;
-        clearSelectionBtn.disabled = false;
-        setStatus("Zona seleccionada. Escolhe o campo correcto e carrega em OCR da selecção.");
-      } else {
-        clearSelection();
-      }
-    }
-
-    // Regista eventos de rato para desktop.
-    imageCanvas.addEventListener("mousedown", startSelection);
-    imageCanvas.addEventListener("mousemove", moveSelection);
-    window.addEventListener("mouseup", endSelection);
-
-    // Regista eventos de toque para telemóvel.
-    imageCanvas.addEventListener("touchstart", startSelection, { passive: false });
-    imageCanvas.addEventListener("touchmove", moveSelection, { passive: false });
-    window.addEventListener("touchend", endSelection, { passive: false });
-
-    // Actualiza a posição visual da caixa de selecção.
-    function updateSelectionBox() {
-      if (!selection) {
-        selectionBox.style.display = "none";
-        return;
-      }
-
-      // Lê a posição do canvas e da área de imagem.
-      const canvasRect = imageCanvas.getBoundingClientRect();
-      const stageRect = imageStage.getBoundingClientRect();
-
-      // Calcula escala entre coordenadas internas e visuais.
-      const scaleX = canvasRect.width / imageCanvas.width;
-      const scaleY = canvasRect.height / imageCanvas.height;
-
-      // Define a posição visual da selecção.
-      const left = (canvasRect.left - stageRect.left + imageStage.scrollLeft) + selection.x * scaleX;
-      const top = (canvasRect.top - stageRect.top + imageStage.scrollTop) + selection.y * scaleY;
-      const width = selection.width * scaleX;
-      const height = selection.height * scaleY;
-
-      // Aplica estilos da caixa de selecção.
-      selectionBox.style.display = "block";
-      selectionBox.style.left = `${left}px`;
-      selectionBox.style.top = `${top}px`;
-      selectionBox.style.width = `${width}px`;
-      selectionBox.style.height = `${height}px`;
-    }
-
-    // Limpa a selecção actual.
-    function clearSelection() {
-      selection = null;
-      selectionBox.style.display = "none";
-      ocrSelectionBtn.disabled = true;
-      clearSelectionBtn.disabled = true;
-    }
-
-    // Liga o botão de limpar selecção.
-    clearSelectionBtn.addEventListener("click", () => {
-      clearSelection();
-      setStatus("Selecção limpa.");
+    // Redesenha o preview sempre que os sliders mudam.
+    [offsetX, offsetY, scaleX, scaleY].forEach((control) => {
+      control.addEventListener("input", () => {
+        drawPreviewWithZones();
+      });
     });
 
-    // Cria uma imagem de canvas a partir da selecção actual.
-    function createCropCanvas() {
-      if (!selection || !originalImage) {
+    // Repõe sliders de ajuste do template.
+    resetTemplateBtn.addEventListener("click", () => {
+      offsetX.value = "0";
+      offsetY.value = "0";
+      scaleX.value = "100";
+      scaleY.value = "100";
+      drawPreviewWithZones();
+      setStatus("Template reposto.");
+    });
+
+    // Calcula zona transformada com offsets e escala global.
+    function transformZone(zone) {
+      // Lê offsets em percentagem e converte para fração.
+      const dx = Number(offsetX.value || 0) / 100;
+      const dy = Number(offsetY.value || 0) / 100;
+
+      // Lê escala em percentagem.
+      const sx = Number(scaleX.value || 100) / 100;
+      const sy = Number(scaleY.value || 100) / 100;
+
+      // Aplica escala em torno do centro aproximado da folha.
+      const centerX = 0.5;
+      const centerY = 0.33;
+
+      // Calcula nova posição.
+      const x = centerX + (zone.x - centerX) * sx + dx;
+      const y = centerY + (zone.y - centerY) * sy + dy;
+
+      // Calcula novas dimensões.
+      const w = zone.w * sx;
+      const h = zone.h * sy;
+
+      // Devolve zona transformada.
+      return { ...zone, x, y, w, h };
+    }
+
+    // Desenha a folha capturada e as caixas do template.
+    function drawPreviewWithZones() {
+      if (!capturedSheetImage) {
+        return;
+      }
+
+      // Define largura de preview.
+      const maxPreviewWidth = 1400;
+
+      // Calcula escala do preview.
+      const previewScale = Math.min(1, maxPreviewWidth / capturedSheetImage.naturalWidth);
+
+      // Define dimensões do canvas visível.
+      sheetCanvas.width = Math.round(capturedSheetImage.naturalWidth * previewScale);
+      sheetCanvas.height = Math.round(capturedSheetImage.naturalHeight * previewScale);
+
+      // Limpa canvas.
+      sheetCtx.clearRect(0, 0, sheetCanvas.width, sheetCanvas.height);
+
+      // Desenha imagem capturada.
+      sheetCtx.drawImage(capturedSheetImage, 0, 0, sheetCanvas.width, sheetCanvas.height);
+
+      // Desenha as zonas OCR sobre o preview.
+      for (const zone of templateZones) {
+        const z = transformZone(zone);
+
+        // Converte percentagens para pixels do preview.
+        const x = z.x * sheetCanvas.width;
+        const y = z.y * sheetCanvas.height;
+        const w = z.w * sheetCanvas.width;
+        const h = z.h * sheetCanvas.height;
+
+        // Ignora zonas fora da imagem.
+        if (x + w < 0 || y + h < 0 || x > sheetCanvas.width || y > sheetCanvas.height) {
+          continue;
+        }
+
+        // Define cor da linha.
+        sheetCtx.strokeStyle = z.color || "#2563eb";
+        sheetCtx.lineWidth = 2;
+
+        // Desenha rectângulo.
+        sheetCtx.strokeRect(x, y, w, h);
+
+        // Desenha etiqueta com fundo.
+        sheetCtx.fillStyle = "rgba(15, 23, 42, 0.80)";
+        sheetCtx.fillRect(x, Math.max(0, y - 18), Math.min(110, w + 30), 18);
+
+        // Escreve etiqueta.
+        sheetCtx.fillStyle = "white";
+        sheetCtx.font = "12px system-ui";
+        sheetCtx.fillText(z.label, x + 4, Math.max(12, y - 5));
+      }
+    }
+
+    // Cria um canvas com o recorte de uma zona do template.
+    function cropZoneToCanvas(zone) {
+      if (!capturedSheetCanvas) {
         return null;
       }
 
-      // Garante que a selecção tem dimensões úteis.
-      if (selection.width < 10 || selection.height < 10) {
-        return null;
-      }
+      // Aplica offset/escala ao template.
+      const z = transformZone(zone);
 
-      // Cria um canvas temporário para o recorte.
+      // Converte coordenadas percentuais para pixels reais.
+      const sourceX = Math.max(0, Math.round(z.x * capturedSheetCanvas.width));
+      const sourceY = Math.max(0, Math.round(z.y * capturedSheetCanvas.height));
+      const sourceW = Math.max(1, Math.round(z.w * capturedSheetCanvas.width));
+      const sourceH = Math.max(1, Math.round(z.h * capturedSheetCanvas.height));
+
+      // Define ampliação para melhorar OCR.
+      const upscale = 4;
+
+      // Cria canvas temporário.
       const cropCanvas = document.createElement("canvas");
 
-      // Escala o recorte para melhorar OCR em escrita pequena.
-      const upscale = 3;
+      // Define dimensões ampliadas.
+      cropCanvas.width = sourceW * upscale;
+      cropCanvas.height = sourceH * upscale;
 
-      // Define o tamanho do recorte.
-      cropCanvas.width = Math.round(selection.width * upscale);
-      cropCanvas.height = Math.round(selection.height * upscale);
-
-      // Obtém o contexto do canvas temporário.
+      // Desenha recorte ampliado.
       const cropCtx = cropCanvas.getContext("2d", { willReadFrequently: true });
-
-      // Desenha o recorte ampliado no canvas temporário.
       cropCtx.drawImage(
-        imageCanvas,
-        selection.x,
-        selection.y,
-        selection.width,
-        selection.height,
+        capturedSheetCanvas,
+        sourceX,
+        sourceY,
+        sourceW,
+        sourceH,
         0,
         0,
         cropCanvas.width,
         cropCanvas.height
       );
 
-      // Aplica pré-processamento conforme escolha do utilizador.
-      applyPreprocessing(cropCanvas, preprocessMode.value);
+      // Processa imagem para melhorar contraste.
+      preprocessCanvas(cropCanvas, zone.kind);
 
-      // Devolve o canvas recortado e processado.
+      // Devolve canvas pronto para OCR.
       return cropCanvas;
     }
 
-    // Aplica grayscale, contraste e binarização ao canvas.
-    function applyPreprocessing(canvas, mode) {
-      if (mode === "none") {
-        return;
-      }
-
-      // Obtém o contexto 2D do canvas.
+    // Aplica pré-processamento simples ao recorte.
+    function preprocessCanvas(canvas, kind) {
+      // Obtém contexto do canvas temporário.
       const localCtx = canvas.getContext("2d", { willReadFrequently: true });
 
-      // Lê todos os pixels da imagem.
+      // Lê pixels.
       const imageData = localCtx.getImageData(0, 0, canvas.width, canvas.height);
 
-      // Guarda o array de pixels.
+      // Obtém array RGBA.
       const data = imageData.data;
 
-      // Define valores conforme intensidade escolhida.
-      const contrast = mode === "strong" ? 1.55 : 1.25;
-      const threshold = mode === "strong" ? 170 : 185;
+      // Ajusta threshold conforme tipo de campo.
+      const threshold = kind === "station" ? 165 : 178;
 
-      // Percorre os pixels de quatro em quatro valores RGBA.
+      // Percorre todos os pixels.
       for (let i = 0; i < data.length; i += 4) {
-        // Calcula luminosidade aproximada do pixel.
+        // Calcula luminosidade.
         let gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
 
-        // Aplica contraste em torno do ponto médio 128.
-        gray = (gray - 128) * contrast + 128;
+        // Aplica contraste forte.
+        gray = (gray - 128) * 1.55 + 128;
 
-        // Aplica binarização no modo forte.
-        if (mode === "strong") {
-          gray = gray > threshold ? 255 : 0;
-        }
+        // Binariza para reduzir ruído de grelha e sombra.
+        gray = gray > threshold ? 255 : 0;
 
-        // Limita valor entre 0 e 255.
-        gray = Math.max(0, Math.min(255, gray));
-
-        // Escreve o pixel em grayscale.
+        // Escreve grayscale.
         data[i] = gray;
         data[i + 1] = gray;
         data[i + 2] = gray;
       }
 
-      // Coloca os pixels processados de volta no canvas.
+      // Coloca pixels processados de volta.
       localCtx.putImageData(imageData, 0, 0);
     }
 
-    // Determina o tipo de OCR a usar com base no select e no campo escolhido.
-    function getEffectiveOcrKind() {
-      if (ocrMode.value !== "auto") {
-        return ocrMode.value;
-      }
-
-      // Obtém a opção seleccionada no campo destino.
-      const selectedOption = targetField.options[targetField.selectedIndex];
-
-      // Usa o tipo associado ao campo, quando existir.
-      return selectedOption ? selectedOption.dataset.kind || "text" : "text";
-    }
-
-    // Devolve uma whitelist de caracteres adequada ao tipo de campo.
+    // Devolve whitelist Tesseract consoante tipo de campo.
     function getWhitelist(kind) {
       if (kind === "time") {
         return "0123456789:.hH";
@@ -1009,271 +1098,295 @@
       return "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz:-/. ";
     }
 
-    // Executa OCR num canvas específico.
-    async function runOcrOnCanvas(canvas, kind) {
-      // Converte o canvas para imagem PNG em memória.
-      const dataUrl = canvas.toDataURL("image/png");
-
-      // Executa Tesseract com whitelist adequada.
-      const result = await Tesseract.recognize(dataUrl, "eng+por", {
-        tessedit_char_whitelist: getWhitelist(kind),
-        logger: (message) => {
-          if (message.status && typeof message.progress === "number") {
-            const pct = Math.round(message.progress * 100);
-            setStatus(`${message.status}: ${pct}%`);
-          }
-        }
-      });
-
-      // Devolve o texto lido.
-      return result.data.text || "";
-    }
-
-    // Limpa e normaliza o texto OCR para um campo específico.
-    function cleanOcrValue(rawText, kind) {
+    // Limpa o texto OCR de acordo com o tipo de campo.
+    function cleanValue(rawText, kind) {
+      // Guarda texto base.
       const raw = String(rawText || "").trim();
 
-      // Para horas, procura HH:MM, H:MM ou H.MM.
+      // Para horas, procura formatos HH:MM, H:MM, HH.MM ou HHhMM.
       if (kind === "time") {
         const match = raw.match(/\b([0-2]?[0-9])[:.hH]([0-5][0-9])\b/);
-        if (!match) {
-          return raw.replace(/\s+/g, "");
+
+        // Se encontrar hora, normaliza para HH:MM.
+        if (match) {
+          return `${match[1].padStart(2, "0")}:${match[2].padStart(2, "0")}`;
         }
 
-        // Normaliza a hora para HH:MM.
-        const hour = match[1].padStart(2, "0");
-        const minute = match[2].padStart(2, "0");
-        return `${hour}:${minute}`;
+        // Como fallback, usa apenas dígitos e tenta HHMM.
+        const digits = raw.replace(/\D+/g, "");
+
+        // Interpreta 3 ou 4 dígitos como hora.
+        if (digits.length === 3) {
+          return `0${digits[0]}:${digits.slice(1)}`;
+        }
+
+        if (digits.length === 4) {
+          return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+        }
+
+        // Devolve texto limpo se não houver padrão.
+        return raw.replace(/\s+/g, "");
       }
 
       // Para números, remove tudo o que não for dígito.
       if (kind === "number") {
-        const digits = raw.replace(/\D+/g, "");
-        return digits;
+        return raw.replace(/\D+/g, "");
       }
 
-      // Para estações, deixa só letras e usa maiúsculas.
+      // Para estações, deixa letras e limita a 4 caracteres.
       if (kind === "station") {
-        const letters = raw.replace(/[^A-Za-z]/g, "").toUpperCase();
-        return letters.slice(0, 4);
+        return raw.replace(/[^A-Za-z]/g, "").toUpperCase().slice(0, 4);
       }
 
-      // Para texto, remove quebras e espaços duplicados.
+      // Para texto livre, normaliza espaços.
       return raw.replace(/\s+/g, " ").trim().toUpperCase();
     }
 
-    // Aplica um valor limpo ao campo escolhido.
-    function applyValueToTarget(value) {
-      const key = targetField.value;
-
+    // Aplica um valor extraído ao campo correspondente.
+    function applyExtractedValue(zoneId, value) {
       // Trata o campo global do serial number.
-      if (key === "technical_log_serial_number") {
+      if (zoneId === "technical_log_serial_number") {
         technicalLogSerialNumber.value = value;
+        autoFilled.add("technical_log_serial_number");
         return;
       }
 
-      // Divide a chave no formato leg_INDEX_FIELD.
-      const parts = key.split("_");
+      // Separa o formato leg_INDEX_FIELD.
+      const parts = zoneId.split("_");
 
       // Lê o índice da leg.
       const legIndex = Number(parts[1]);
 
-      // Reconstrói o nome do campo, que pode ter underscores.
+      // Reconstrói o nome do campo.
       const fieldKey = parts.slice(2).join("_");
 
-      // Garante que a leg existe.
+      // Sai se a leg não existir.
       if (!legs[legIndex]) {
         return;
       }
 
-      // Aplica o valor ao modelo de dados.
+      // Aplica valor ao modelo.
       legs[legIndex][fieldKey] = value;
 
-      // Redesenha a tabela para mostrar o valor.
-      renderLegsTable();
-
-      // Recria opções para manter labels coerentes.
-      populateTargetFieldOptions();
-
-      // Repõe o target anterior se ainda existir.
-      targetField.value = key;
+      // Marca campo como preenchido por OCR.
+      autoFilled.add(zoneId);
     }
 
-    // Executa OCR apenas na zona seleccionada.
-    ocrSelectionBtn.addEventListener("click", async () => {
-      const cropCanvas = createCropCanvas();
-
-      // Sai se não houver selecção válida.
-      if (!cropCanvas) {
-        setStatus("Selecciona primeiro uma zona válida.", true);
+    // Extrai todos os campos ou apenas uma leg específica.
+    async function extractZones(legIndex = null) {
+      if (!capturedSheetCanvas) {
+        setStatus("Captura ou carrega uma folha primeiro.", true);
         return;
       }
 
-      // Obtém o tipo de OCR efectivo.
-      const kind = getEffectiveOcrKind();
-
-      // Desactiva o botão durante o OCR.
-      ocrSelectionBtn.disabled = true;
-      setStatus("OCR da selecção em curso...");
-
-      try {
-        // Executa o OCR na imagem recortada.
-        const raw = await runOcrOnCanvas(cropCanvas, kind);
-
-        // Guarda texto bruto para auditoria.
-        ocrText.value = raw;
-
-        // Limpa o valor para o campo escolhido.
-        const clean = cleanOcrValue(raw, kind);
-
-        // Aplica o valor ao campo escolhido.
-        applyValueToTarget(clean);
-
-        // Mostra estado final.
-        setStatus(`Valor aplicado: ${clean || "(vazio)"}`);
-      } catch (error) {
-        console.error(error);
-        setStatus("Erro no OCR da selecção. Tenta uma zona mais pequena ou muda o pré-processamento.", true);
-      } finally {
-        // Reactiva o botão se a selecção continuar válida.
-        ocrSelectionBtn.disabled = !selection;
-      }
-    });
-
-    // Executa OCR na folha inteira apenas para referência.
-    ocrFullBtn.addEventListener("click", async () => {
-      if (!originalImage) {
-        setStatus("Carrega primeiro uma fotografia.", true);
-        return;
-      }
-
-      // Desactiva o botão durante o OCR.
-      ocrFullBtn.disabled = true;
-      setStatus("OCR da folha inteira em curso. Pode gerar muito ruído...");
-
-      try {
-        // Cria um canvas temporário com a imagem completa.
-        const fullCanvas = document.createElement("canvas");
-
-        // Define escala moderada para OCR global.
-        const scale = 1.5;
-
-        // Define tamanho do canvas temporário.
-        fullCanvas.width = Math.round(originalImage.naturalWidth * scale);
-        fullCanvas.height = Math.round(originalImage.naturalHeight * scale);
-
-        // Desenha a imagem no canvas temporário.
-        const fullCtx = fullCanvas.getContext("2d", { willReadFrequently: true });
-        fullCtx.drawImage(originalImage, 0, 0, fullCanvas.width, fullCanvas.height);
-
-        // Aplica pré-processamento médio para folha inteira.
-        applyPreprocessing(fullCanvas, "medium");
-
-        // Executa OCR como texto geral.
-        const raw = await runOcrOnCanvas(fullCanvas, "text");
-
-        // Mostra texto bruto.
-        ocrText.value = raw;
-
-        // Tenta encontrar serial number a partir do texto global.
-        const serial = findSerialInText(raw);
-
-        // Preenche serial se for detectado.
-        if (serial) {
-          technicalLogSerialNumber.value = serial;
+      // Cria lista de zonas a processar.
+      const zones = templateZones.filter((zone) => {
+        if (zone.id === "technical_log_serial_number") {
+          return legIndex === null;
         }
 
+        if (legIndex === null) {
+          return true;
+        }
+
+        return zone.id.startsWith(`leg_${legIndex}_`);
+      });
+
+      // Sai se não houver zonas.
+      if (!zones.length) {
+        return;
+      }
+
+      // Desactiva botões durante OCR.
+      enableExtractionButtons(false);
+      setProgress(0, zones.length);
+      setStatus("A preparar OCR...");
+
+      // Cria worker Tesseract uma vez para evitar recarregar em cada campo.
+      let worker = null;
+
+      try {
+        // Inicia worker de OCR.
+        worker = await Tesseract.createWorker("eng");
+
+        // Processa cada zona sequencialmente.
+        for (let i = 0; i < zones.length; i++) {
+          const zone = zones[i];
+
+          // Actualiza estado.
+          setStatus(`A ler ${zone.label} (${i + 1}/${zones.length})...`);
+          setProgress(i, zones.length);
+
+          // Recorta a zona para canvas.
+          const cropCanvas = cropZoneToCanvas(zone);
+
+          // Se o recorte falhar, ignora a zona.
+          if (!cropCanvas) {
+            continue;
+          }
+
+          // Define whitelist conforme tipo de campo.
+          await worker.setParameters({
+            tessedit_char_whitelist: getWhitelist(zone.kind)
+          });
+
+          // Executa OCR na zona.
+          const result = await worker.recognize(cropCanvas);
+
+          // Guarda texto bruto do último OCR.
+          ocrText.value = result.data.text || "";
+
+          // Limpa o valor.
+          const clean = cleanValue(result.data.text, zone.kind);
+
+          // Aplica só se houver algum valor.
+          if (clean !== "") {
+            applyExtractedValue(zone.id, clean);
+          }
+
+          // Actualiza progresso.
+          setProgress(i + 1, zones.length);
+        }
+
+        // Redesenha tabela com campos preenchidos.
+        renderLegsTable();
+
         // Mostra conclusão.
-        setStatus("OCR da folha inteira concluída. Usa-a só como apoio; confirma manualmente.");
+        setStatus("Extracção concluída. Confirma e corrige a tabela antes de gerar JSON.");
       } catch (error) {
         console.error(error);
-        setStatus("Erro no OCR da folha inteira.", true);
+        setStatus("Erro durante a extracção. Tenta melhorar a foto ou ajustar o template.", true);
       } finally {
-        // Reactiva o botão após OCR.
-        ocrFullBtn.disabled = false;
+        // Termina worker se tiver sido criado.
+        if (worker) {
+          await worker.terminate();
+        }
+
+        // Reactiva botões.
+        enableExtractionButtons(true);
+
+        // Esconde progresso após breve atraso.
+        setTimeout(() => setProgress(0, 0), 800);
       }
-    });
-
-    // Procura um possível serial number no texto OCR.
-    function findSerialInText(text) {
-      const clean = String(text || "").replace(/\s+/g, " ");
-
-      // Procura primeiro junto de palavras relevantes.
-      const contextual =
-        clean.match(/serial\s*number[^0-9]{0,30}([0-9]{3,6})/i) ||
-        clean.match(/technical\s*log[^0-9]{0,40}([0-9]{3,6})/i);
-
-      // Devolve valor contextual quando existe.
-      if (contextual) {
-        return contextual[1];
-      }
-
-      // Como fallback, procura número de 4 a 6 dígitos iniciado por zero.
-      const fallback = clean.match(/\b0[0-9]{3,5}\b/);
-
-      // Devolve fallback ou vazio.
-      return fallback ? fallback[0] : "";
     }
 
-    // Aplica manualmente o texto OCR ao campo seleccionado.
-    applyTextBtn.addEventListener("click", () => {
-      const kind = getEffectiveOcrKind();
-      const clean = cleanOcrValue(ocrText.value, kind);
-      applyValueToTarget(clean);
-      setStatus(`Texto aplicado ao campo escolhido: ${clean || "(vazio)"}`);
-    });
+    // Liga botões de extracção.
+    extractAllBtn.addEventListener("click", () => extractZones(null));
+    extractLeg1Btn.addEventListener("click", () => extractZones(0));
+    extractLeg2Btn.addEventListener("click", () => extractZones(1));
+    extractLeg3Btn.addEventListener("click", () => extractZones(2));
+    extractLeg4Btn.addEventListener("click", () => extractZones(3));
 
-    // Limpa a caixa de texto OCR.
-    cleanTextBtn.addEventListener("click", () => {
-      ocrText.value = "";
-      setStatus("Texto OCR limpo.");
-    });
+    // Desenha a tabela editável.
+    function renderLegsTable() {
+      // Limpa corpo da tabela.
+      legsTableBody.innerHTML = "";
+
+      // Cria uma linha por leg.
+      legs.forEach((leg, index) => {
+        // Cria linha.
+        const row = document.createElement("tr");
+
+        // Cria uma célula por campo.
+        legFields.forEach((field) => {
+          // Cria célula.
+          const cell = document.createElement("td");
+
+          // Cria input.
+          const input = document.createElement("input");
+
+          // Define valor e placeholder.
+          input.value = leg[field.key] ?? "";
+          input.placeholder = field.placeholder;
+
+          // Guarda metadados no input.
+          input.dataset.index = String(index);
+          input.dataset.field = field.key;
+
+          // Aplica destaque quando veio de OCR.
+          if (autoFilled.has(`leg_${index}_${field.key}`)) {
+            input.classList.add("autoFilled");
+          }
+
+          // Actualiza dados quando utilizador edita.
+          input.addEventListener("input", (event) => {
+            const rowIndex = Number(event.target.dataset.index);
+            const key = event.target.dataset.field;
+            legs[rowIndex][key] = event.target.value;
+          });
+
+          // Adiciona input à célula.
+          cell.appendChild(input);
+
+          // Adiciona célula à linha.
+          row.appendChild(cell);
+        });
+
+        // Cria célula de acção.
+        const actionCell = document.createElement("td");
+
+        // Cria botão remover.
+        const removeButton = document.createElement("button");
+
+        // Define texto do botão.
+        removeButton.textContent = "Remover";
+
+        // Define estilo secundário.
+        removeButton.className = "secondary";
+
+        // Define tipo do botão.
+        removeButton.type = "button";
+
+        // Remove leg quando clicado.
+        removeButton.addEventListener("click", () => {
+          legs.splice(index, 1);
+          renderLegsTable();
+        });
+
+        // Adiciona botão à célula.
+        actionCell.appendChild(removeButton);
+
+        // Adiciona célula à linha.
+        row.appendChild(actionCell);
+
+        // Adiciona linha à tabela.
+        legsTableBody.appendChild(row);
+      });
+    }
 
     // Adiciona uma nova leg vazia.
     addLegBtn.addEventListener("click", () => {
       legs.push(createEmptyLeg(legs.length + 1));
       renderLegsTable();
-      populateTargetFieldOptions();
       setStatus("Nova leg adicionada.");
     });
 
-    // Limpa todos os dados da app.
-    clearAllBtn.addEventListener("click", () => {
-      // Limpa imagem e input de ficheiro.
-      originalImage = null;
-      photoInput.value = "";
+    // Limpa apenas a tabela e dados gerais.
+    clearTableBtn.addEventListener("click", () => {
+      // Limpa marcações OCR.
+      autoFilled.clear();
 
-      // Limpa canvas.
-      imageCanvas.width = 0;
-      imageCanvas.height = 0;
-
-      // Limpa selecção.
-      clearSelection();
-
-      // Limpa OCR e dados gerais.
-      ocrText.value = "";
+      // Limpa serial.
       technicalLogSerialNumber.value = "";
 
       // Repõe quatro legs vazias.
       legs.splice(0, legs.length, createEmptyLeg(1), createEmptyLeg(2), createEmptyLeg(3), createEmptyLeg(4));
 
-      // Redesenha interface.
+      // Redesenha tabela.
       renderLegsTable();
-      populateTargetFieldOptions();
 
       // Limpa JSON.
       jsonOutput.textContent = "{}";
 
-      // Desactiva botões que dependem de dados.
-      ocrFullBtn.disabled = true;
+      // Desactiva botões de JSON.
       copyJsonBtn.disabled = true;
       downloadJsonBtn.disabled = true;
 
-      // Mostra estado final.
-      setStatus("Tudo limpo.");
+      // Mostra estado.
+      setStatus("Tabela limpa.");
     });
 
-    // Constrói o payload final para JSON.
+    // Constrói o payload final.
     function buildPayload() {
       return {
         technical_log_serial_number: emptyToNull(technicalLogSerialNumber.value),
@@ -1295,75 +1408,75 @@
       };
     }
 
-    // Gera o JSON final após confirmação manual.
+    // Gera JSON final.
     generateJsonBtn.addEventListener("click", () => {
-      // Constrói o objecto final.
+      // Constrói objecto.
       const payload = buildPayload();
 
       // Converte para JSON formatado.
       const json = JSON.stringify(payload, null, 2);
 
-      // Mostra o JSON no ecrã.
+      // Mostra JSON.
       jsonOutput.textContent = json;
 
-      // Activa botões de cópia e download.
+      // Activa botões de cópia/download.
       copyJsonBtn.disabled = false;
       downloadJsonBtn.disabled = false;
 
-      // Remove URL antigo quando existe.
+      // Remove URL antigo se existir.
       if (currentJsonBlobUrl) {
         URL.revokeObjectURL(currentJsonBlobUrl);
       }
 
-      // Cria um Blob com o JSON.
+      // Cria Blob.
       const blob = new Blob([json], { type: "application/json" });
 
-      // Cria URL local para download.
+      // Cria URL de download.
       currentJsonBlobUrl = URL.createObjectURL(blob);
 
-      // Mostra estado final.
-      setStatus("JSON gerado. Confirma antes de usar em integração LEON.");
+      // Mostra estado.
+      setStatus("JSON gerado. Usa só depois de confirmar todos os campos.");
     });
 
-    // Copia o JSON final para a área de transferência.
+    // Copia JSON para clipboard.
     copyJsonBtn.addEventListener("click", async () => {
       try {
-        // Usa a API Clipboard do browser.
+        // Copia texto do JSON.
         await navigator.clipboard.writeText(jsonOutput.textContent);
 
-        // Confirma cópia.
+        // Mostra confirmação.
         setStatus("JSON copiado.");
       } catch (error) {
         console.error(error);
-        setStatus("Não foi possível copiar automaticamente. Copia manualmente o texto.", true);
+        setStatus("Não foi possível copiar automaticamente. Copia manualmente.", true);
       }
     });
 
-    // Descarrega o JSON final como ficheiro.
+    // Descarrega JSON como ficheiro.
     downloadJsonBtn.addEventListener("click", () => {
       if (!currentJsonBlobUrl) {
         return;
       }
 
-      // Usa o serial number no nome do ficheiro quando existir.
+      // Usa serial number no nome do ficheiro quando existir.
       const serial = technicalLogSerialNumber.value.trim() || "sem-serial";
 
-      // Cria uma âncora temporária.
+      // Cria link temporário.
       const link = document.createElement("a");
 
-      // Define o URL do ficheiro.
+      // Define destino do link.
       link.href = currentJsonBlobUrl;
 
-      // Define o nome do ficheiro.
+      // Define nome do ficheiro.
       link.download = `atl-${serial}.json`;
 
-      // Adiciona a âncora ao DOM.
+      // Adiciona link ao DOM.
       document.body.appendChild(link);
 
-      // Simula clique para iniciar download.
+      // Executa download.
       link.click();
 
-      // Remove a âncora temporária.
+      // Remove link.
       link.remove();
     });
   </script>
