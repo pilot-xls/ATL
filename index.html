@@ -1,26 +1,26 @@
 <!doctype html>
 <html lang="pt-PT">
 <head>
-  <!-- Define a codificação para caracteres portugueses e símbolos técnicos. -->
+  <!-- Define a codificação para acentos, símbolos e texto técnico. -->
   <meta charset="utf-8" />
 
-  <!-- Faz a aplicação adaptar-se ao ecrã do telemóvel. -->
+  <!-- Garante comportamento correcto em telemóvel. -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Define a cor principal da PWA quando instalada. -->
+  <!-- Define a cor principal da aplicação instalada. -->
   <meta name="theme-color" content="#0f172a" />
 
   <!-- Liga o manifesto da PWA. -->
   <link rel="manifest" href="./manifest.json" />
 
-  <!-- Define o título da página. -->
-  <title>ATL Extractor V1.3</title>
+  <!-- Define o título do separador/browser. -->
+  <title>ATL Extractor V1.4</title>
 
   <!-- Carrega o Tesseract.js para OCR gratuito no browser. -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <style>
-    /* Define variáveis visuais base. */
+    /* Define variáveis visuais globais. */
     :root {
       --bg: #f3f4f6;
       --card: #ffffff;
@@ -43,9 +43,9 @@
       background: var(--bg);
     }
 
-    /* Define o contentor principal da aplicação. */
+    /* Define o contentor principal. */
     .app {
-      max-width: 1220px;
+      max-width: 1240px;
       margin: 0 auto;
       padding: 14px;
     }
@@ -71,14 +71,14 @@
       font-size: 1.1rem;
     }
 
-    /* Estiliza subtítulo. */
+    /* Define subtítulo no cabeçalho. */
     .subtitle {
       margin: 0;
       color: #cbd5e1;
       font-size: 0.95rem;
     }
 
-    /* Cria cartões brancos para as secções. */
+    /* Cria cartões visuais. */
     .card {
       background: var(--card);
       border-radius: 16px;
@@ -87,7 +87,7 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
-    /* Mostra notas em cinzento. */
+    /* Mostra texto auxiliar. */
     .note {
       color: var(--muted);
       font-size: 0.92rem;
@@ -95,7 +95,7 @@
       margin: 6px 0 10px;
     }
 
-    /* Destaca uma instrução importante. */
+    /* Realça uma instrução útil. */
     .hint {
       background: #ecfdf5;
       color: #064e3b;
@@ -106,7 +106,7 @@
       margin: 8px 0;
     }
 
-    /* Organiza botões com quebra de linha. */
+    /* Organiza botões. */
     .actions {
       display: flex;
       flex-wrap: wrap;
@@ -115,7 +115,7 @@
       margin-top: 10px;
     }
 
-    /* Define o estilo base dos botões. */
+    /* Define botões principais. */
     button {
       border: 0;
       border-radius: 10px;
@@ -138,7 +138,7 @@
       color: white;
     }
 
-    /* Mostra botões desactivados com menor opacidade. */
+    /* Mostra botões desactivados. */
     button:disabled {
       opacity: 0.45;
       cursor: not-allowed;
@@ -162,14 +162,14 @@
       margin-bottom: 6px;
     }
 
-    /* Dá altura útil ao texto OCR bruto. */
+    /* Dá altura útil ao OCR bruto. */
     textarea {
       min-height: 105px;
       resize: vertical;
       white-space: pre-wrap;
     }
 
-    /* Cria grelha responsiva para opções. */
+    /* Cria grelha responsiva para controlos. */
     .grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -183,7 +183,7 @@
       }
     }
 
-    /* Define a área da imagem original. */
+    /* Define área rolável para canvas. */
     .canvasBox {
       position: relative;
       overflow: auto;
@@ -194,23 +194,12 @@
       touch-action: none;
     }
 
-    /* Define os canvas usados pela aplicação. */
+    /* Define canvas. */
     canvas {
       display: block;
       max-width: 100%;
       height: auto;
       background: #020617;
-    }
-
-    /* Define a área da folha rectificada. */
-    .warpedBox {
-      position: relative;
-      overflow: auto;
-      background: #020617;
-      border-radius: 14px;
-      border: 1px solid #d1d5db;
-      max-height: 72vh;
-      margin-top: 10px;
     }
 
     /* Define texto pequeno auxiliar. */
@@ -255,14 +244,14 @@
       transition: width 0.2s ease;
     }
 
-    /* Cria área rolável para tabela larga. */
+    /* Define área rolável de tabela. */
     .table-wrap {
       overflow-x: auto;
       border: 1px solid var(--line);
       border-radius: 12px;
     }
 
-    /* Define tabela editável. */
+    /* Define tabela. */
     table {
       width: 100%;
       min-width: 1080px;
@@ -270,7 +259,7 @@
       background: white;
     }
 
-    /* Define células da tabela. */
+    /* Define células. */
     th, td {
       border-bottom: 1px solid var(--line);
       border-right: 1px solid var(--line);
@@ -292,7 +281,7 @@
       border-right: 0;
     }
 
-    /* Faz inputs de tabela ocupar a célula. */
+    /* Faz inputs ocupar a célula. */
     td input {
       border: 0;
       border-radius: 6px;
@@ -301,12 +290,7 @@
     }
 
     /* Destaca campos preenchidos por OCR. */
-    td input.autoFilled {
-      background: #eff6ff;
-      outline: 1px solid #bfdbfe;
-    }
-
-    /* Destaca o campo serial quando veio de OCR. */
+    td input.autoFilled,
     input.autoFilled {
       background: #eff6ff;
       outline: 1px solid #bfdbfe;
@@ -341,74 +325,112 @@
   <main class="app">
     <!-- Cabeçalho da aplicação. -->
     <header>
-      <h1>ATL Extractor V1.3</h1>
-      <p class="subtitle">Foto → margens com o dedo → folha rectificada → OCR por template → tabela editável → JSON.</p>
+      <h1>ATL Extractor V1.4</h1>
+      <p class="subtitle">Foto → margens → rectificação → rectângulos azuis arrastáveis → OCR → tabela → JSON.</p>
     </header>
 
-    <!-- Resumo do método. -->
+    <!-- Explicação da versão. -->
     <section class="card">
-      <h2>Modo scanner</h2>
+      <h2>Modo scanner com campos ajustáveis</h2>
       <p class="note">
-        Esta versão funciona como uma app de digitalização: tiras ou carregas a foto, arrastas os quatro cantos para as margens da folha,
-        a app rectifica a perspectiva e depois aplica o OCR nas zonas certas.
+        Depois de rectificares a folha, podes arrastar os rectângulos azuis com o dedo para os alinhar com os campos reais.
+        As posições são guardadas no telemóvel para a próxima utilização.
       </p>
       <div class="hint">
-        Este fluxo é mais prático do que seleccionar célula a célula e mais robusto do que tentar ler a folha inclinada.
+        Primeiro ajusta os 4 cantos da folha. Depois ajusta os rectângulos azuis uma vez. A partir daí, a app deve ficar mais rápida no uso diário.
       </div>
       <span class="pill">4 cantos</span>
-      <span class="pill">perspectiva corrigida</span>
-      <span class="pill">template fixo</span>
-      <span class="pill">confirmação manual</span>
+      <span class="pill">rectificação</span>
+      <span class="pill">rectângulos arrastáveis</span>
+      <span class="pill">posições guardadas</span>
     </section>
 
-    <!-- Secção de captura/carregamento. -->
+    <!-- Secção de fotografia. -->
     <section class="card">
       <h2>1. Tirar ou carregar fotografia</h2>
-      <p class="note">
-        Tira a foto com a folha inteira visível. Não é preciso ficar perfeita; vais ajustar os cantos no passo seguinte.
-      </p>
+      <p class="note">Tira a foto com a folha inteira visível. Depois ajusta os quatro pontos amarelos aos cantos da folha.</p>
 
-      <!-- Input de ficheiro com sugestão de câmara traseira no telemóvel. -->
+      <!-- Input para câmara/ficheiro. -->
       <input id="photoInput" type="file" accept="image/*" capture="environment" />
 
-      <!-- Botões de apoio. -->
+      <!-- Botões da fotografia e margens. -->
       <div class="actions">
         <button id="resetCornersBtn" class="secondary" disabled>Repor cantos</button>
         <button id="warpBtn" disabled>Rectificar folha</button>
         <button id="clearAllBtn" class="danger">Limpar tudo</button>
       </div>
 
-      <!-- Mensagem de estado. -->
+      <!-- Estado e progresso. -->
       <div id="status" class="status"></div>
-
-      <!-- Barra de progresso. -->
       <div id="progressWrap" class="progressWrap">
         <div id="progressBar"></div>
       </div>
     </section>
 
-    <!-- Secção de definição de margens. -->
+    <!-- Secção dos cantos da folha. -->
     <section class="card">
       <h2>2. Definir margens da folha</h2>
       <p class="note">
-        Arrasta os quatro pontos amarelos para os cantos da folha. A ordem é: topo esquerdo, topo direito, fundo direito, fundo esquerdo.
+        Arrasta os quatro pontos amarelos para os cantos da folha. Ordem: topo esquerdo, topo direito, fundo direito, fundo esquerdo.
       </p>
 
-      <!-- Canvas da fotografia original com quadrilátero editável. -->
+      <!-- Canvas da fotografia original. -->
       <div class="canvasBox">
         <canvas id="sourceCanvas"></canvas>
       </div>
 
-      <!-- Nota curta sobre a interação. -->
-      <p class="mini">No telemóvel, arrasta os pontos com o dedo. Se ficar desalinhado, usa “Repor cantos”.</p>
+      <!-- Ajuda para telemóvel. -->
+      <p class="mini">No telemóvel, arrasta os pontos amarelos com o dedo.</p>
     </section>
 
-    <!-- Secção de folha corrigida e OCR. -->
+    <!-- Secção da folha rectificada e campos ajustáveis. -->
     <section class="card">
-      <h2>3. Folha rectificada e OCR</h2>
+      <h2>3. Ajustar campos OCR</h2>
       <p class="note">
-        Depois de rectificar, confirma se a folha ficou direita. As caixas azuis mostram as zonas que serão lidas.
+        Arrasta os rectângulos azuis/verdes para cima dos campos correctos. Toca num rectângulo para o seleccionar.
+        Usa os botões de tamanho se a caixa estiver demasiado pequena ou grande.
       </p>
+
+      <!-- Controlos da zona seleccionada. -->
+      <div class="grid">
+        <div>
+          <label for="selectedZoneLabel">Campo seleccionado</label>
+          <input id="selectedZoneLabel" readonly placeholder="nenhum" />
+        </div>
+        <div>
+          <label for="resizeStep">Passo de tamanho</label>
+          <select id="resizeStep">
+            <option value="0.002">Pequeno</option>
+            <option value="0.005" selected>Médio</option>
+            <option value="0.010">Grande</option>
+          </select>
+        </div>
+        <div>
+          <label for="nudgeStep">Passo de deslocação</label>
+          <select id="nudgeStep">
+            <option value="0.002">Pequeno</option>
+            <option value="0.005" selected>Médio</option>
+            <option value="0.010">Grande</option>
+          </select>
+        </div>
+        <div>
+          <label for="zoneVisibility">Visualização</label>
+          <select id="zoneVisibility">
+            <option value="all" selected>Todas as caixas</option>
+            <option value="selected">Só seleccionada</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Botões para ajustar ou guardar zonas. -->
+      <div class="actions">
+        <button id="zoneWiderBtn" class="secondary" disabled>Mais larga</button>
+        <button id="zoneNarrowerBtn" class="secondary" disabled>Menos larga</button>
+        <button id="zoneTallerBtn" class="secondary" disabled>Mais alta</button>
+        <button id="zoneShorterBtn" class="secondary" disabled>Menos alta</button>
+        <button id="saveZonesBtn" class="secondary">Guardar posições</button>
+        <button id="resetZonesBtn" class="secondary">Repor posições</button>
+      </div>
 
       <!-- Botões de extracção. -->
       <div class="actions">
@@ -419,21 +441,19 @@
         <button id="extractLeg4Btn" class="secondary" disabled>Extrair Leg 4</button>
       </div>
 
-      <!-- Preview da folha rectificada. -->
-      <div class="warpedBox">
+      <!-- Canvas da folha rectificada. -->
+      <div class="canvasBox" style="margin-top: 10px;">
         <canvas id="warpedCanvas"></canvas>
       </div>
 
-      <!-- Texto auxiliar. -->
-      <p class="mini">Azul = campos por leg. Verde = technical log serial number.</p>
+      <!-- Ajuda rápida. -->
+      <p class="mini">Azul = campos por leg. Verde = technical log serial number. Rectângulo com linha amarela = seleccionado.</p>
     </section>
 
     <!-- Secção de OCR bruto. -->
     <section class="card">
       <h2>4. Último OCR bruto</h2>
-      <p class="note">
-        Serve apenas para diagnóstico. O valor final deve ser confirmado na tabela.
-      </p>
+      <p class="note">Serve apenas para diagnóstico. O valor final deve ser confirmado na tabela.</p>
       <textarea id="ocrText" placeholder="Último texto OCR..."></textarea>
     </section>
 
@@ -448,12 +468,10 @@
       </div>
     </section>
 
-    <!-- Secção da tabela editável. -->
+    <!-- Secção de tabela. -->
     <section class="card">
       <h2>6. Tabela editável</h2>
-      <p class="note">
-        Os campos em azul claro foram preenchidos por OCR. Corrige manualmente antes de gerar o JSON.
-      </p>
+      <p class="note">Os campos em azul claro foram preenchidos por OCR. Corrige manualmente antes de gerar o JSON.</p>
 
       <!-- Tabela horizontalmente rolável. -->
       <div class="table-wrap">
@@ -480,7 +498,7 @@
         </table>
       </div>
 
-      <!-- Botões de gestão e JSON. -->
+      <!-- Botões da tabela. -->
       <div class="actions">
         <button id="addLegBtn" class="secondary">Adicionar leg</button>
         <button id="clearTableBtn" class="secondary">Limpar tabela</button>
@@ -490,7 +508,7 @@
       </div>
     </section>
 
-    <!-- Secção do JSON final. -->
+    <!-- Secção de JSON. -->
     <section class="card">
       <h2>7. JSON final</h2>
       <pre id="jsonOutput">{}</pre>
@@ -498,29 +516,41 @@
   </main>
 
   <script>
-    // Guarda a imagem original carregada pelo utilizador.
+    // Guarda a imagem original carregada.
     let sourceImage = null;
 
-    // Guarda escala visual entre a imagem original e o canvas visível.
+    // Guarda a escala entre imagem real e canvas visível.
     let sourceScale = 1;
 
-    // Guarda os quatro cantos seleccionados em coordenadas do canvas visível.
+    // Guarda os quatro cantos da folha no canvas original visível.
     let corners = [];
 
-    // Guarda o índice do canto que está a ser arrastado.
+    // Guarda qual canto está activo.
     let activeCornerIndex = -1;
 
-    // Guarda se o utilizador está a arrastar um canto.
+    // Indica se um canto está a ser arrastado.
     let isDraggingCorner = false;
 
-    // Guarda o canvas interno da folha rectificada.
+    // Guarda a folha rectificada em canvas interno.
     let warpedInternalCanvas = null;
 
-    // Guarda o URL temporário usado para descarregar JSON.
+    // Guarda o URL temporário para download do JSON.
     let currentJsonBlobUrl = null;
 
-    // Guarda campos preenchidos por OCR.
+    // Guarda campos preenchidos automaticamente.
     const autoFilled = new Set();
+
+    // Guarda o índice da zona seleccionada.
+    let selectedZoneIndex = -1;
+
+    // Guarda se uma zona está a ser arrastada.
+    let isDraggingZone = false;
+
+    // Guarda o ponto inicial do arrasto da zona.
+    let zoneDragStart = { x: 0, y: 0 };
+
+    // Guarda a posição inicial da zona arrastada.
+    let zoneStartPosition = { x: 0, y: 0 };
 
     // Selecciona elementos do DOM.
     const photoInput = document.getElementById("photoInput");
@@ -532,6 +562,16 @@
     const progressBar = document.getElementById("progressBar");
     const sourceCanvas = document.getElementById("sourceCanvas");
     const warpedCanvas = document.getElementById("warpedCanvas");
+    const selectedZoneLabel = document.getElementById("selectedZoneLabel");
+    const resizeStep = document.getElementById("resizeStep");
+    const nudgeStep = document.getElementById("nudgeStep");
+    const zoneVisibility = document.getElementById("zoneVisibility");
+    const zoneWiderBtn = document.getElementById("zoneWiderBtn");
+    const zoneNarrowerBtn = document.getElementById("zoneNarrowerBtn");
+    const zoneTallerBtn = document.getElementById("zoneTallerBtn");
+    const zoneShorterBtn = document.getElementById("zoneShorterBtn");
+    const saveZonesBtn = document.getElementById("saveZonesBtn");
+    const resetZonesBtn = document.getElementById("resetZonesBtn");
     const extractAllBtn = document.getElementById("extractAllBtn");
     const extractLeg1Btn = document.getElementById("extractLeg1Btn");
     const extractLeg2Btn = document.getElementById("extractLeg2Btn");
@@ -547,20 +587,23 @@
     const downloadJsonBtn = document.getElementById("downloadJsonBtn");
     const jsonOutput = document.getElementById("jsonOutput");
 
-    // Obtém contextos de desenho dos canvas.
+    // Obtém contextos 2D dos canvas.
     const sourceCtx = sourceCanvas.getContext("2d", { willReadFrequently: true });
     const warpedCtx = warpedCanvas.getContext("2d", { willReadFrequently: true });
 
-    // Define a dimensão normalizada da folha rectificada.
+    // Define a largura interna da folha rectificada.
     const WARPED_WIDTH = 1800;
 
     // Define a proporção aproximada da folha em paisagem.
     const SHEET_RATIO = 1.62;
 
-    // Define a altura normalizada da folha rectificada.
+    // Define a altura interna da folha rectificada.
     const WARPED_HEIGHT = Math.round(WARPED_WIDTH / SHEET_RATIO);
 
-    // Define campos da tabela por leg.
+    // Define chave localStorage para guardar posições das zonas.
+    const ZONES_STORAGE_KEY = "atl_v1_4_template_zones";
+
+    // Define os campos por leg.
     const legFields = [
       { key: "leg", label: "Leg", placeholder: "1" },
       { key: "refuel", label: "Refuel", placeholder: "222" },
@@ -577,44 +620,53 @@
       { key: "delay_code", label: "Delay Cod.", placeholder: "93" }
     ];
 
-    // Cria as quatro legs iniciais.
+    // Cria quatro legs iniciais.
     const legs = [createEmptyLeg(1), createEmptyLeg(2), createEmptyLeg(3), createEmptyLeg(4)];
 
-    // Define posições verticais base das quatro legs no template da folha rectificada.
-    const legBaseY = [0.158, 0.256, 0.354, 0.452];
+    // Cria template padrão de zonas OCR.
+    function createDefaultTemplateZones() {
+      // Define posições verticais base das quatro legs.
+      const legBaseY = [0.158, 0.256, 0.354, 0.452];
 
-    // Define as zonas OCR em percentagem da folha rectificada.
-    const templateZones = [
-      { id: "technical_log_serial_number", label: "Serial", kind: "number", x: 0.735, y: 0.010, w: 0.115, h: 0.070, color: "#22c55e" }
-    ];
+      // Começa com o serial number.
+      const zones = [
+        { id: "technical_log_serial_number", label: "Serial", kind: "number", x: 0.735, y: 0.010, w: 0.115, h: 0.070, color: "#22c55e" }
+      ];
 
-    // Cria zonas de OCR para cada leg.
-    for (let i = 0; i < 4; i++) {
-      // Guarda a base vertical da leg.
-      const y = legBaseY[i];
+      // Cria zonas de OCR para cada leg.
+      for (let i = 0; i < 4; i++) {
+        // Guarda posição vertical da leg.
+        const y = legBaseY[i];
 
-      // Define zonas de combustível.
-      templateZones.push({ id: `leg_${i}_refuel`, label: `L${i + 1} Refuel`, kind: "number", x: 0.108, y: y + 0.000, w: 0.070, h: 0.028, color: "#2563eb" });
-      templateZones.push({ id: `leg_${i}_depart`, label: `L${i + 1} Depart`, kind: "number", x: 0.108, y: y + 0.028, w: 0.070, h: 0.028, color: "#2563eb" });
-      templateZones.push({ id: `leg_${i}_arrival`, label: `L${i + 1} Arrival`, kind: "number", x: 0.108, y: y + 0.056, w: 0.070, h: 0.028, color: "#2563eb" });
+        // Zonas de fuel.
+        zones.push({ id: `leg_${i}_refuel`, label: `L${i + 1} Refuel`, kind: "number", x: 0.108, y: y + 0.000, w: 0.070, h: 0.028, color: "#2563eb" });
+        zones.push({ id: `leg_${i}_depart`, label: `L${i + 1} Depart`, kind: "number", x: 0.108, y: y + 0.028, w: 0.070, h: 0.028, color: "#2563eb" });
+        zones.push({ id: `leg_${i}_arrival`, label: `L${i + 1} Arrival`, kind: "number", x: 0.108, y: y + 0.056, w: 0.070, h: 0.028, color: "#2563eb" });
 
-      // Define zonas de partida.
-      templateZones.push({ id: `leg_${i}_station_departure`, label: `L${i + 1} Dep Stn`, kind: "station", x: 0.245, y: y + 0.020, w: 0.075, h: 0.028, color: "#2563eb" });
-      templateZones.push({ id: `leg_${i}_off_blk`, label: `L${i + 1} Off`, kind: "time", x: 0.245, y: y + 0.047, w: 0.075, h: 0.028, color: "#2563eb" });
-      templateZones.push({ id: `leg_${i}_atd`, label: `L${i + 1} ATD`, kind: "time", x: 0.245, y: y + 0.074, w: 0.075, h: 0.028, color: "#2563eb" });
+        // Zonas de partida.
+        zones.push({ id: `leg_${i}_station_departure`, label: `L${i + 1} Dep Stn`, kind: "station", x: 0.245, y: y + 0.020, w: 0.075, h: 0.028, color: "#2563eb" });
+        zones.push({ id: `leg_${i}_off_blk`, label: `L${i + 1} Off`, kind: "time", x: 0.245, y: y + 0.047, w: 0.075, h: 0.028, color: "#2563eb" });
+        zones.push({ id: `leg_${i}_atd`, label: `L${i + 1} ATD`, kind: "time", x: 0.245, y: y + 0.074, w: 0.075, h: 0.028, color: "#2563eb" });
 
-      // Define zonas de chegada.
-      templateZones.push({ id: `leg_${i}_station_arrival`, label: `L${i + 1} Arr Stn`, kind: "station", x: 0.330, y: y + 0.020, w: 0.075, h: 0.028, color: "#2563eb" });
-      templateZones.push({ id: `leg_${i}_ata`, label: `L${i + 1} ATA`, kind: "time", x: 0.330, y: y + 0.047, w: 0.075, h: 0.028, color: "#2563eb" });
-      templateZones.push({ id: `leg_${i}_on_blk`, label: `L${i + 1} On`, kind: "time", x: 0.330, y: y + 0.074, w: 0.075, h: 0.028, color: "#2563eb" });
+        // Zonas de chegada.
+        zones.push({ id: `leg_${i}_station_arrival`, label: `L${i + 1} Arr Stn`, kind: "station", x: 0.330, y: y + 0.020, w: 0.075, h: 0.028, color: "#2563eb" });
+        zones.push({ id: `leg_${i}_ata`, label: `L${i + 1} ATA`, kind: "time", x: 0.330, y: y + 0.047, w: 0.075, h: 0.028, color: "#2563eb" });
+        zones.push({ id: `leg_${i}_on_blk`, label: `L${i + 1} On`, kind: "time", x: 0.330, y: y + 0.074, w: 0.075, h: 0.028, color: "#2563eb" });
 
-      // Define zonas de passageiros.
-      templateZones.push({ id: `leg_${i}_pax`, label: `L${i + 1} PAX`, kind: "number", x: 0.523, y: y + 0.018, w: 0.035, h: 0.060, color: "#2563eb" });
-      templateZones.push({ id: `leg_${i}_trans`, label: `L${i + 1} Trans`, kind: "number", x: 0.558, y: y + 0.018, w: 0.035, h: 0.060, color: "#2563eb" });
+        // Zonas de passageiros.
+        zones.push({ id: `leg_${i}_pax`, label: `L${i + 1} PAX`, kind: "number", x: 0.523, y: y + 0.018, w: 0.035, h: 0.060, color: "#2563eb" });
+        zones.push({ id: `leg_${i}_trans`, label: `L${i + 1} Trans`, kind: "number", x: 0.558, y: y + 0.018, w: 0.035, h: 0.060, color: "#2563eb" });
 
-      // Define zona de delay code.
-      templateZones.push({ id: `leg_${i}_delay_code`, label: `L${i + 1} Delay`, kind: "text", x: 0.705, y: y + 0.012, w: 0.048, h: 0.075, color: "#2563eb" });
+        // Zona de delay code.
+        zones.push({ id: `leg_${i}_delay_code`, label: `L${i + 1} Delay`, kind: "text", x: 0.705, y: y + 0.012, w: 0.048, h: 0.075, color: "#2563eb" });
+      }
+
+      // Devolve o template completo.
+      return zones;
     }
+
+    // Guarda as zonas activas da aplicação.
+    let templateZones = loadTemplateZones();
 
     // Regista o service worker para PWA.
     if ("serviceWorker" in navigator) {
@@ -625,8 +677,41 @@
       });
     }
 
-    // Desenha a tabela inicial.
+    // Desenha tabela inicial.
     renderLegsTable();
+
+    // Carrega zonas guardadas ou cria template padrão.
+    function loadTemplateZones() {
+      try {
+        // Lê JSON de localStorage.
+        const saved = localStorage.getItem(ZONES_STORAGE_KEY);
+
+        // Se não houver guardado, devolve padrão.
+        if (!saved) {
+          return createDefaultTemplateZones();
+        }
+
+        // Converte o JSON guardado.
+        const parsed = JSON.parse(saved);
+
+        // Confirma que é lista válida.
+        if (!Array.isArray(parsed) || parsed.length < 10) {
+          return createDefaultTemplateZones();
+        }
+
+        // Devolve zonas guardadas.
+        return parsed;
+      } catch (error) {
+        // Em caso de erro, usa padrão.
+        console.warn("Não foi possível carregar zonas guardadas:", error);
+        return createDefaultTemplateZones();
+      }
+    }
+
+    // Guarda zonas no localStorage.
+    function saveTemplateZones() {
+      localStorage.setItem(ZONES_STORAGE_KEY, JSON.stringify(templateZones));
+    }
 
     // Cria uma leg vazia.
     function createEmptyLeg(legNumber) {
@@ -671,12 +756,12 @@
       // Calcula percentagem.
       const pct = Math.round((current / total) * 100);
 
-      // Mostra progresso.
+      // Actualiza interface.
       progressWrap.style.display = "block";
       progressBar.style.width = `${pct}%`;
     }
 
-    // Carrega uma foto escolhida pelo utilizador.
+    // Carrega uma fotografia.
     photoInput.addEventListener("change", () => {
       const file = photoInput.files && photoInput.files[0];
 
@@ -685,14 +770,14 @@
         return;
       }
 
-      // Cria leitor local.
+      // Lê o ficheiro local.
       const reader = new FileReader();
 
-      // Quando a leitura terminar, cria uma imagem.
+      // Cria imagem quando a leitura termina.
       reader.onload = () => {
         const img = new Image();
 
-        // Quando a imagem estiver pronta, guarda e desenha.
+        // Quando a imagem carrega, desenha no canvas.
         img.onload = () => {
           sourceImage = img;
           setupSourceCanvas();
@@ -700,14 +785,14 @@
           drawSourceWithCorners();
           resetCornersBtn.disabled = false;
           warpBtn.disabled = false;
-          setStatus("Foto carregada. Arrasta os quatro pontos amarelos para os cantos da folha.");
+          setStatus("Foto carregada. Ajusta os pontos amarelos aos cantos da folha.");
         };
 
-        // Define a origem da imagem.
+        // Define origem da imagem.
         img.src = reader.result;
       };
 
-      // Lê o ficheiro como Data URL.
+      // Lê ficheiro como Data URL.
       reader.readAsDataURL(file);
     });
 
@@ -717,28 +802,28 @@
         return;
       }
 
-      // Define largura máxima visual para fluidez.
+      // Limita largura visual para manter desempenho.
       const maxWidth = 1400;
 
-      // Calcula escala do canvas visível.
+      // Calcula escala visual.
       sourceScale = Math.min(1, maxWidth / sourceImage.naturalWidth);
 
-      // Define dimensões visíveis do canvas.
+      // Define dimensões do canvas.
       sourceCanvas.width = Math.round(sourceImage.naturalWidth * sourceScale);
       sourceCanvas.height = Math.round(sourceImage.naturalHeight * sourceScale);
     }
 
-    // Repõe cantos para uma margem interna padrão.
+    // Repõe cantos para uma margem padrão.
     function resetCorners() {
       if (!sourceCanvas.width || !sourceCanvas.height) {
         return;
       }
 
-      // Define margem inicial de 8%.
+      // Define margem interna de 8%.
       const mx = sourceCanvas.width * 0.08;
       const my = sourceCanvas.height * 0.08;
 
-      // Define ordem: topo esquerdo, topo direito, fundo direito, fundo esquerdo.
+      // Define os quatro cantos na ordem esperada.
       corners = [
         { x: mx, y: my },
         { x: sourceCanvas.width - mx, y: my },
@@ -747,23 +832,23 @@
       ];
     }
 
-    // Liga o botão para repor cantos.
+    // Repor cantos manualmente.
     resetCornersBtn.addEventListener("click", () => {
       resetCorners();
       drawSourceWithCorners();
       setStatus("Cantos repostos. Ajusta-os às margens reais da folha.");
     });
 
-    // Desenha a imagem original e os cantos.
+    // Desenha imagem original com os quatro cantos.
     function drawSourceWithCorners() {
       if (!sourceImage) {
         return;
       }
 
-      // Limpa o canvas.
+      // Limpa canvas.
       sourceCtx.clearRect(0, 0, sourceCanvas.width, sourceCanvas.height);
 
-      // Desenha a imagem escalada.
+      // Desenha imagem original escalada.
       sourceCtx.drawImage(sourceImage, 0, 0, sourceCanvas.width, sourceCanvas.height);
 
       // Sai se ainda não houver cantos.
@@ -771,7 +856,7 @@
         return;
       }
 
-      // Desenha o polígono da folha.
+      // Desenha polígono seleccionado.
       sourceCtx.beginPath();
       sourceCtx.moveTo(corners[0].x, corners[0].y);
       sourceCtx.lineTo(corners[1].x, corners[1].y);
@@ -781,22 +866,18 @@
       sourceCtx.strokeStyle = "#22c55e";
       sourceCtx.lineWidth = 3;
       sourceCtx.stroke();
-
-      // Preenche ligeiramente a área seleccionada.
       sourceCtx.fillStyle = "rgba(34, 197, 94, 0.12)";
       sourceCtx.fill();
 
-      // Desenha cada canto com número.
+      // Desenha pontos amarelos numerados.
       corners.forEach((point, index) => {
         sourceCtx.beginPath();
-        sourceCtx.arc(point.x, point.y, 14, 0, Math.PI * 2);
+        sourceCtx.arc(point.x, point.y, 15, 0, Math.PI * 2);
         sourceCtx.fillStyle = "#f59e0b";
         sourceCtx.fill();
         sourceCtx.strokeStyle = "#111827";
         sourceCtx.lineWidth = 2;
         sourceCtx.stroke();
-
-        // Escreve o número do canto.
         sourceCtx.fillStyle = "#111827";
         sourceCtx.font = "bold 14px system-ui";
         sourceCtx.textAlign = "center";
@@ -805,63 +886,62 @@
       });
     }
 
-    // Obtém coordenadas de rato/toque relativas ao canvas.
-    function getCanvasPoint(event) {
+    // Obtém coordenadas relativas ao canvas original.
+    function getSourceCanvasPoint(event) {
       const rect = sourceCanvas.getBoundingClientRect();
 
-      // Usa o primeiro toque quando for evento táctil.
-      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-      const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+      // Usa coordenadas de pointer event.
+      const clientX = event.clientX;
+      const clientY = event.clientY;
 
-      // Converte coordenadas visuais para coordenadas internas do canvas.
-      const x = (clientX - rect.left) * (sourceCanvas.width / rect.width);
-      const y = (clientY - rect.top) * (sourceCanvas.height / rect.height);
-
-      // Limita o ponto ao canvas.
+      // Converte para coordenadas internas.
       return {
-        x: Math.max(0, Math.min(sourceCanvas.width, x)),
-        y: Math.max(0, Math.min(sourceCanvas.height, y))
+        x: Math.max(0, Math.min(sourceCanvas.width, (clientX - rect.left) * (sourceCanvas.width / rect.width))),
+        y: Math.max(0, Math.min(sourceCanvas.height, (clientY - rect.top) * (sourceCanvas.height / rect.height)))
       };
     }
 
-    // Encontra o canto mais próximo do ponto.
+    // Encontra canto próximo.
     function findNearestCorner(point) {
       let bestIndex = -1;
       let bestDistance = Infinity;
 
-      // Mede distância a cada canto.
+      // Calcula distância a cada canto.
       corners.forEach((corner, index) => {
         const dx = corner.x - point.x;
         const dy = corner.y - point.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Guarda o mais próximo.
+        // Guarda o canto mais próximo.
         if (distance < bestDistance) {
           bestDistance = distance;
           bestIndex = index;
         }
       });
 
-      // Só aceita se estiver dentro de raio útil.
-      return bestDistance <= 42 ? bestIndex : -1;
+      // Aceita apenas dentro de um raio confortável para dedo.
+      return bestDistance <= 46 ? bestIndex : -1;
     }
 
-    // Começa o arrasto de um canto.
-    function startCornerDrag(event) {
+    // Começa arrasto dos cantos.
+    sourceCanvas.addEventListener("pointerdown", (event) => {
       if (!sourceImage || corners.length !== 4) {
         return;
       }
 
-      // Evita scroll durante o arrasto.
+      // Evita scroll durante arrasto.
       event.preventDefault();
 
-      // Obtém ponto tocado.
-      const point = getCanvasPoint(event);
+      // Captura o pointer para continuar a receber eventos.
+      sourceCanvas.setPointerCapture(event.pointerId);
+
+      // Obtém ponto de toque.
+      const point = getSourceCanvasPoint(event);
 
       // Procura canto próximo.
       const index = findNearestCorner(point);
 
-      // Sai se não tocou num canto.
+      // Sai se não tocar num canto.
       if (index === -1) {
         return;
       }
@@ -869,117 +949,70 @@
       // Activa arrasto.
       activeCornerIndex = index;
       isDraggingCorner = true;
-    }
+    });
 
-    // Move o canto activo.
-    function moveCornerDrag(event) {
+    // Move canto activo.
+    sourceCanvas.addEventListener("pointermove", (event) => {
       if (!isDraggingCorner || activeCornerIndex === -1) {
         return;
       }
 
-      // Evita scroll durante arrasto.
+      // Evita scroll.
       event.preventDefault();
 
-      // Obtém novo ponto.
-      const point = getCanvasPoint(event);
+      // Actualiza canto.
+      corners[activeCornerIndex] = getSourceCanvasPoint(event);
 
-      // Actualiza canto activo.
-      corners[activeCornerIndex] = point;
-
-      // Redesenha a imagem com o polígono.
+      // Redesenha.
       drawSourceWithCorners();
-    }
+    });
 
-    // Termina o arrasto.
-    function endCornerDrag(event) {
-      if (!isDraggingCorner) {
-        return;
-      }
-
-      // Evita comportamento padrão.
-      event.preventDefault();
-
-      // Desactiva arrasto.
+    // Termina arrasto de canto.
+    sourceCanvas.addEventListener("pointerup", () => {
       isDraggingCorner = false;
       activeCornerIndex = -1;
-    }
+    });
 
-    // Liga eventos de rato.
-    sourceCanvas.addEventListener("mousedown", startCornerDrag);
-    sourceCanvas.addEventListener("mousemove", moveCornerDrag);
-    window.addEventListener("mouseup", endCornerDrag);
+    // Cancela arrasto de canto.
+    sourceCanvas.addEventListener("pointercancel", () => {
+      isDraggingCorner = false;
+      activeCornerIndex = -1;
+    });
 
-    // Liga eventos de toque.
-    sourceCanvas.addEventListener("touchstart", startCornerDrag, { passive: false });
-    sourceCanvas.addEventListener("touchmove", moveCornerDrag, { passive: false });
-    window.addEventListener("touchend", endCornerDrag, { passive: false });
-
-    // Calcula a matriz de homografia que mapeia pontos de destino para fonte.
-    function getPerspectiveTransform(dstPoints, srcPoints) {
-      // Cria matriz aumentada para resolver oito incógnitas.
-      const matrix = [];
-
-      // Cria uma linha por coordenada de cada ponto.
-      for (let i = 0; i < 4; i++) {
-        const x = dstPoints[i].x;
-        const y = dstPoints[i].y;
-        const u = srcPoints[i].x;
-        const v = srcPoints[i].y;
-
-        // Equação para u.
-        matrix.push([x, y, 1, 0, 0, 0, -u * x, -u * y, u]);
-
-        // Equação para v.
-        matrix.push([0, 0, 0, x, y, 1, -v * x, -v * y, v]);
-      }
-
-      // Resolve sistema linear por eliminação de Gauss.
-      const h = solveLinearSystem(matrix);
-
-      // Devolve matriz 3x3 com h33 igual a 1.
-      return [
-        h[0], h[1], h[2],
-        h[3], h[4], h[5],
-        h[6], h[7], 1
-      ];
-    }
-
-    // Resolve sistema linear representado por matriz aumentada.
+    // Resolve sistema linear por eliminação de Gauss.
     function solveLinearSystem(a) {
       // Define número de incógnitas.
       const n = 8;
 
-      // Faz eliminação de Gauss com pivot parcial.
+      // Percorre colunas.
       for (let col = 0; col < n; col++) {
         let pivotRow = col;
 
-        // Procura melhor pivot.
+        // Procura maior pivot.
         for (let row = col + 1; row < n; row++) {
           if (Math.abs(a[row][col]) > Math.abs(a[pivotRow][col])) {
             pivotRow = row;
           }
         }
 
-        // Troca linhas se necessário.
+        // Troca linhas.
         const temp = a[col];
         a[col] = a[pivotRow];
         a[pivotRow] = temp;
 
-        // Evita divisão por zero.
+        // Normaliza pivot.
         const pivot = a[col][col] || 1e-12;
-
-        // Normaliza linha pivot.
         for (let j = col; j <= n; j++) {
           a[col][j] /= pivot;
         }
 
-        // Elimina a coluna nas outras linhas.
+        // Elimina nas outras linhas.
         for (let row = 0; row < n; row++) {
           if (row === col) {
             continue;
           }
 
-          // Guarda factor de eliminação.
+          // Calcula factor.
           const factor = a[row][col];
 
           // Subtrai linha pivot.
@@ -989,47 +1022,70 @@
         }
       }
 
-      // Extrai a solução da última coluna.
+      // Extrai solução.
       return a.map((row) => row[n]);
     }
 
-    // Rectifica a folha usando a homografia definida pelos quatro cantos.
+    // Calcula homografia que mapeia destino para origem.
+    function getPerspectiveTransform(dstPoints, srcPoints) {
+      const matrix = [];
+
+      // Cria equações para os quatro pontos.
+      for (let i = 0; i < 4; i++) {
+        const x = dstPoints[i].x;
+        const y = dstPoints[i].y;
+        const u = srcPoints[i].x;
+        const v = srcPoints[i].y;
+
+        // Equação de u.
+        matrix.push([x, y, 1, 0, 0, 0, -u * x, -u * y, u]);
+
+        // Equação de v.
+        matrix.push([0, 0, 0, x, y, 1, -v * x, -v * y, v]);
+      }
+
+      // Resolve sistema.
+      const h = solveLinearSystem(matrix);
+
+      // Devolve matriz 3x3.
+      return [h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7], 1];
+    }
+
+    // Rectifica a folha.
     warpBtn.addEventListener("click", () => {
       if (!sourceImage || corners.length !== 4) {
         setStatus("Carrega uma foto e define os quatro cantos primeiro.", true);
         return;
       }
 
-      // Cria canvas interno da folha rectificada.
+      // Cria canvas interno rectificado.
       warpedInternalCanvas = document.createElement("canvas");
-
-      // Define dimensões normalizadas.
       warpedInternalCanvas.width = WARPED_WIDTH;
       warpedInternalCanvas.height = WARPED_HEIGHT;
 
-      // Cria canvas temporário com a imagem original na escala real.
+      // Cria canvas real da imagem original.
       const realCanvas = document.createElement("canvas");
       realCanvas.width = sourceImage.naturalWidth;
       realCanvas.height = sourceImage.naturalHeight;
 
-      // Desenha a imagem original na escala real.
+      // Desenha a imagem original em escala real.
       const realCtx = realCanvas.getContext("2d", { willReadFrequently: true });
       realCtx.drawImage(sourceImage, 0, 0, realCanvas.width, realCanvas.height);
 
-      // Lê pixels da imagem real.
+      // Lê pixels da imagem original.
       const sourceData = realCtx.getImageData(0, 0, realCanvas.width, realCanvas.height);
 
       // Cria imagem de destino.
       const targetCtx = warpedInternalCanvas.getContext("2d", { willReadFrequently: true });
       const targetData = targetCtx.createImageData(WARPED_WIDTH, WARPED_HEIGHT);
 
-      // Converte cantos do canvas visível para coordenadas reais da imagem.
+      // Converte cantos visuais para coordenadas reais.
       const srcPoints = corners.map((p) => ({
         x: p.x / sourceScale,
         y: p.y / sourceScale
       }));
 
-      // Define cantos do destino rectificado.
+      // Define cantos do destino.
       const dstPoints = [
         { x: 0, y: 0 },
         { x: WARPED_WIDTH - 1, y: 0 },
@@ -1040,7 +1096,7 @@
       // Calcula homografia de destino para origem.
       const h = getPerspectiveTransform(dstPoints, srcPoints);
 
-      // Percorre cada pixel do destino.
+      // Percorre pixels do destino.
       for (let y = 0; y < WARPED_HEIGHT; y++) {
         for (let x = 0; x < WARPED_WIDTH; x++) {
           // Aplica homografia.
@@ -1048,10 +1104,10 @@
           const sx = (h[0] * x + h[1] * y + h[2]) / denom;
           const sy = (h[3] * x + h[4] * y + h[5]) / denom;
 
-          // Calcula índice do destino.
+          // Índice destino.
           const targetIndex = (y * WARPED_WIDTH + x) * 4;
 
-          // Se a coordenada estiver fora da imagem, escreve branco.
+          // Preenche branco se estiver fora.
           if (sx < 0 || sy < 0 || sx >= sourceData.width - 1 || sy >= sourceData.height - 1) {
             targetData.data[targetIndex] = 255;
             targetData.data[targetIndex + 1] = 255;
@@ -1060,12 +1116,12 @@
             continue;
           }
 
-          // Usa amostragem nearest-neighbour para simplicidade e velocidade.
+          // Usa nearest-neighbour para performance.
           const nearestX = Math.round(sx);
           const nearestY = Math.round(sy);
           const sourceIndex = (nearestY * sourceData.width + nearestX) * 4;
 
-          // Copia pixel de origem para destino.
+          // Copia pixel.
           targetData.data[targetIndex] = sourceData.data[sourceIndex];
           targetData.data[targetIndex + 1] = sourceData.data[sourceIndex + 1];
           targetData.data[targetIndex + 2] = sourceData.data[sourceIndex + 2];
@@ -1073,62 +1129,295 @@
         }
       }
 
-      // Escreve imagem rectificada no canvas interno.
+      // Escreve imagem rectificada.
       targetCtx.putImageData(targetData, 0, 0);
 
       // Desenha preview com zonas.
       drawWarpedPreviewWithZones();
 
-      // Activa OCR.
+      // Activa extracção.
       enableExtractionButtons(true);
 
       // Mostra estado.
-      setStatus("Folha rectificada. Confirma o preview e depois extrai.");
+      setStatus("Folha rectificada. Agora podes arrastar os rectângulos azuis/verdes para os sítios certos.");
     });
 
-    // Desenha a folha rectificada com caixas de OCR.
+    // Converte ponto do pointer para coordenadas normalizadas da folha rectificada.
+    function getWarpedPoint(event) {
+      const rect = warpedCanvas.getBoundingClientRect();
+
+      // Calcula coordenada interna do canvas visível.
+      const canvasX = (event.clientX - rect.left) * (warpedCanvas.width / rect.width);
+      const canvasY = (event.clientY - rect.top) * (warpedCanvas.height / rect.height);
+
+      // Converte para percentagem da folha.
+      return {
+        x: Math.max(0, Math.min(1, canvasX / warpedCanvas.width)),
+        y: Math.max(0, Math.min(1, canvasY / warpedCanvas.height))
+      };
+    }
+
+    // Encontra a zona que contém o ponto.
+    function findZoneAtPoint(point) {
+      // Percorre de trás para frente para seleccionar a zona visualmente superior.
+      for (let i = templateZones.length - 1; i >= 0; i--) {
+        const z = templateZones[i];
+
+        // Verifica se o ponto está dentro do rectângulo.
+        if (point.x >= z.x && point.x <= z.x + z.w && point.y >= z.y && point.y <= z.y + z.h) {
+          return i;
+        }
+      }
+
+      // Devolve -1 se não encontrou.
+      return -1;
+    }
+
+    // Actualiza UI da zona seleccionada.
+    function updateSelectedZoneUI() {
+      const zone = templateZones[selectedZoneIndex];
+
+      // Actualiza label.
+      selectedZoneLabel.value = zone ? zone.label : "";
+
+      // Activa/desactiva botões de tamanho.
+      const hasZone = Boolean(zone);
+      zoneWiderBtn.disabled = !hasZone;
+      zoneNarrowerBtn.disabled = !hasZone;
+      zoneTallerBtn.disabled = !hasZone;
+      zoneShorterBtn.disabled = !hasZone;
+    }
+
+    // Começa o arrasto de uma zona OCR.
+    warpedCanvas.addEventListener("pointerdown", (event) => {
+      if (!warpedInternalCanvas) {
+        return;
+      }
+
+      // Evita scroll durante arrasto.
+      event.preventDefault();
+
+      // Captura pointer.
+      warpedCanvas.setPointerCapture(event.pointerId);
+
+      // Obtém ponto.
+      const point = getWarpedPoint(event);
+
+      // Encontra zona tocada.
+      const index = findZoneAtPoint(point);
+
+      // Se não tocar em zona, limpa selecção.
+      if (index === -1) {
+        selectedZoneIndex = -1;
+        updateSelectedZoneUI();
+        drawWarpedPreviewWithZones();
+        return;
+      }
+
+      // Selecciona zona.
+      selectedZoneIndex = index;
+      updateSelectedZoneUI();
+
+      // Guarda estado inicial do arrasto.
+      isDraggingZone = true;
+      zoneDragStart = point;
+      zoneStartPosition = { x: templateZones[index].x, y: templateZones[index].y };
+
+      // Redesenha com destaque.
+      drawWarpedPreviewWithZones();
+    });
+
+    // Move a zona activa.
+    warpedCanvas.addEventListener("pointermove", (event) => {
+      if (!isDraggingZone || selectedZoneIndex === -1) {
+        return;
+      }
+
+      // Evita scroll.
+      event.preventDefault();
+
+      // Calcula deslocação normalizada.
+      const point = getWarpedPoint(event);
+      const dx = point.x - zoneDragStart.x;
+      const dy = point.y - zoneDragStart.y;
+
+      // Obtém zona.
+      const z = templateZones[selectedZoneIndex];
+
+      // Actualiza posição, mantendo dentro da folha.
+      z.x = Math.max(0, Math.min(1 - z.w, zoneStartPosition.x + dx));
+      z.y = Math.max(0, Math.min(1 - z.h, zoneStartPosition.y + dy));
+
+      // Redesenha.
+      drawWarpedPreviewWithZones();
+    });
+
+    // Termina arrasto da zona.
+    warpedCanvas.addEventListener("pointerup", () => {
+      if (isDraggingZone) {
+        saveTemplateZones();
+      }
+
+      // Limpa estado de arrasto.
+      isDraggingZone = false;
+    });
+
+    // Cancela arrasto da zona.
+    warpedCanvas.addEventListener("pointercancel", () => {
+      if (isDraggingZone) {
+        saveTemplateZones();
+      }
+
+      // Limpa estado de arrasto.
+      isDraggingZone = false;
+    });
+
+    // Desenha folha rectificada com zonas OCR.
     function drawWarpedPreviewWithZones() {
       if (!warpedInternalCanvas) {
         return;
       }
 
-      // Define preview com largura máxima.
+      // Define escala de preview.
       const maxPreviewWidth = 1400;
-
-      // Calcula escala de preview.
       const previewScale = Math.min(1, maxPreviewWidth / warpedInternalCanvas.width);
 
-      // Define dimensões visíveis.
+      // Define tamanho do canvas visível.
       warpedCanvas.width = Math.round(warpedInternalCanvas.width * previewScale);
       warpedCanvas.height = Math.round(warpedInternalCanvas.height * previewScale);
 
-      // Desenha a folha rectificada.
+      // Desenha folha rectificada.
       warpedCtx.clearRect(0, 0, warpedCanvas.width, warpedCanvas.height);
       warpedCtx.drawImage(warpedInternalCanvas, 0, 0, warpedCanvas.width, warpedCanvas.height);
 
-      // Desenha cada zona OCR.
-      for (const zone of templateZones) {
-        // Converte percentagens em pixels.
+      // Decide se mostra todas as zonas ou só a seleccionada.
+      const onlySelected = zoneVisibility.value === "selected";
+
+      // Desenha zonas.
+      for (let i = 0; i < templateZones.length; i++) {
+        const zone = templateZones[i];
+
+        // Ignora não seleccionadas quando modo é só seleccionada.
+        if (onlySelected && i !== selectedZoneIndex) {
+          continue;
+        }
+
+        // Converte coordenadas percentuais para pixels.
         const x = zone.x * warpedCanvas.width;
         const y = zone.y * warpedCanvas.height;
         const w = zone.w * warpedCanvas.width;
         const h = zone.h * warpedCanvas.height;
 
+        // Define estilo do rectângulo.
+        warpedCtx.strokeStyle = i === selectedZoneIndex ? "#f59e0b" : (zone.color || "#2563eb");
+        warpedCtx.lineWidth = i === selectedZoneIndex ? 4 : 2;
+
         // Desenha rectângulo.
-        warpedCtx.strokeStyle = zone.color || "#2563eb";
-        warpedCtx.lineWidth = 2;
         warpedCtx.strokeRect(x, y, w, h);
 
+        // Desenha fundo da etiqueta.
+        warpedCtx.fillStyle = "rgba(15, 23, 42, 0.82)";
+        warpedCtx.fillRect(x, Math.max(0, y - 18), Math.min(125, w + 50), 18);
+
         // Desenha etiqueta.
-        warpedCtx.fillStyle = "rgba(15, 23, 42, 0.80)";
-        warpedCtx.fillRect(x, Math.max(0, y - 18), Math.min(115, w + 40), 18);
         warpedCtx.fillStyle = "white";
         warpedCtx.font = "12px system-ui";
         warpedCtx.fillText(zone.label, x + 4, Math.max(12, y - 5));
+
+        // Desenha pequeno marcador no centro para indicar que é arrastável.
+        warpedCtx.beginPath();
+        warpedCtx.arc(x + w / 2, y + h / 2, 4, 0, Math.PI * 2);
+        warpedCtx.fillStyle = i === selectedZoneIndex ? "#f59e0b" : (zone.color || "#2563eb");
+        warpedCtx.fill();
       }
     }
 
-    // Activa/desactiva botões de extracção.
+    // Redesenha quando a visibilidade muda.
+    zoneVisibility.addEventListener("change", () => {
+      drawWarpedPreviewWithZones();
+    });
+
+    // Ajusta tamanho da zona seleccionada.
+    function resizeSelectedZone(deltaW, deltaH) {
+      if (selectedZoneIndex === -1) {
+        return;
+      }
+
+      // Obtém zona.
+      const z = templateZones[selectedZoneIndex];
+
+      // Ajusta largura/altura com limites mínimos.
+      z.w = Math.max(0.010, Math.min(0.300, z.w + deltaW));
+      z.h = Math.max(0.010, Math.min(0.200, z.h + deltaH));
+
+      // Mantém zona dentro da folha.
+      z.x = Math.max(0, Math.min(1 - z.w, z.x));
+      z.y = Math.max(0, Math.min(1 - z.h, z.y));
+
+      // Guarda e redesenha.
+      saveTemplateZones();
+      drawWarpedPreviewWithZones();
+    }
+
+    // Liga botões de tamanho.
+    zoneWiderBtn.addEventListener("click", () => resizeSelectedZone(Number(resizeStep.value), 0));
+    zoneNarrowerBtn.addEventListener("click", () => resizeSelectedZone(-Number(resizeStep.value), 0));
+    zoneTallerBtn.addEventListener("click", () => resizeSelectedZone(0, Number(resizeStep.value)));
+    zoneShorterBtn.addEventListener("click", () => resizeSelectedZone(0, -Number(resizeStep.value)));
+
+    // Guarda posições manualmente.
+    saveZonesBtn.addEventListener("click", () => {
+      saveTemplateZones();
+      setStatus("Posições dos rectângulos guardadas neste dispositivo.");
+    });
+
+    // Repõe posições padrão.
+    resetZonesBtn.addEventListener("click", () => {
+      templateZones = createDefaultTemplateZones();
+      saveTemplateZones();
+      selectedZoneIndex = -1;
+      updateSelectedZoneUI();
+      drawWarpedPreviewWithZones();
+      setStatus("Posições dos rectângulos repostas.");
+    });
+
+    // Desloca zona seleccionada com o teclado em desktop.
+    window.addEventListener("keydown", (event) => {
+      if (selectedZoneIndex === -1) {
+        return;
+      }
+
+      // Lê passo de deslocação.
+      const step = Number(nudgeStep.value);
+
+      // Obtém zona seleccionada.
+      const z = templateZones[selectedZoneIndex];
+
+      // Define se a tecla foi usada.
+      let used = true;
+
+      // Ajusta posição conforme seta.
+      if (event.key === "ArrowLeft") {
+        z.x = Math.max(0, z.x - step);
+      } else if (event.key === "ArrowRight") {
+        z.x = Math.min(1 - z.w, z.x + step);
+      } else if (event.key === "ArrowUp") {
+        z.y = Math.max(0, z.y - step);
+      } else if (event.key === "ArrowDown") {
+        z.y = Math.min(1 - z.h, z.y + step);
+      } else {
+        used = false;
+      }
+
+      // Se usou tecla, impede scroll e redesenha.
+      if (used) {
+        event.preventDefault();
+        saveTemplateZones();
+        drawWarpedPreviewWithZones();
+      }
+    });
+
+    // Activa/desactiva botões de OCR.
     function enableExtractionButtons(enabled) {
       extractAllBtn.disabled = !enabled;
       extractLeg1Btn.disabled = !enabled;
@@ -1149,17 +1438,15 @@
       const sourceW = Math.max(1, Math.round(zone.w * warpedInternalCanvas.width));
       const sourceH = Math.max(1, Math.round(zone.h * warpedInternalCanvas.height));
 
-      // Define ampliação para OCR.
+      // Define ampliação para melhorar OCR.
       const upscale = 4;
 
       // Cria canvas temporário.
       const cropCanvas = document.createElement("canvas");
-
-      // Define tamanho ampliado.
       cropCanvas.width = sourceW * upscale;
       cropCanvas.height = sourceH * upscale;
 
-      // Desenha a zona ampliada.
+      // Desenha recorte ampliado.
       const cropCtx = cropCanvas.getContext("2d", { willReadFrequently: true });
       cropCtx.drawImage(
         warpedInternalCanvas,
@@ -1173,22 +1460,20 @@
         cropCanvas.height
       );
 
-      // Aplica pré-processamento.
+      // Pré-processa recorte.
       preprocessCanvas(cropCanvas, zone.kind);
 
       // Devolve recorte.
       return cropCanvas;
     }
 
-    // Pré-processa um recorte para OCR.
+    // Pré-processa imagem para OCR.
     function preprocessCanvas(canvas, kind) {
       // Obtém contexto.
       const localCtx = canvas.getContext("2d", { willReadFrequently: true });
 
       // Lê pixels.
       const imageData = localCtx.getImageData(0, 0, canvas.width, canvas.height);
-
-      // Guarda dados RGBA.
       const data = imageData.data;
 
       // Define threshold conforme tipo.
@@ -1205,17 +1490,17 @@
         // Binariza.
         gray = gray > threshold ? 255 : 0;
 
-        // Escreve pixel em grayscale.
+        // Escreve grayscale.
         data[i] = gray;
         data[i + 1] = gray;
         data[i + 2] = gray;
       }
 
-      // Actualiza canvas.
+      // Escreve pixels no canvas.
       localCtx.putImageData(imageData, 0, 0);
     }
 
-    // Devolve whitelist OCR por tipo de campo.
+    // Define whitelist para OCR.
     function getWhitelist(kind) {
       if (kind === "time") {
         return "0123456789:.hH";
@@ -1232,21 +1517,21 @@
       return "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz:-/. ";
     }
 
-    // Limpa valor OCR por tipo de campo.
+    // Limpa valor OCR.
     function cleanValue(rawText, kind) {
-      // Normaliza texto base.
+      // Normaliza texto.
       const raw = String(rawText || "").trim();
 
       // Trata horas.
       if (kind === "time") {
         const match = raw.match(/\b([0-2]?[0-9])[:.hH]([0-5][0-9])\b/);
 
-        // Normaliza hora se houver match.
+        // Normaliza hora com separador.
         if (match) {
           return `${match[1].padStart(2, "0")}:${match[2].padStart(2, "0")}`;
         }
 
-        // Usa fallback com dígitos.
+        // Tenta interpretar apenas dígitos.
         const digits = raw.replace(/\D+/g, "");
 
         // Interpreta 3 dígitos como HMM.
@@ -1277,9 +1562,9 @@
       return raw.replace(/\s+/g, " ").trim().toUpperCase();
     }
 
-    // Aplica valor extraído ao campo certo.
+    // Aplica valor extraído ao campo correcto.
     function applyExtractedValue(zoneId, value) {
-      // Trata campo global.
+      // Trata serial number.
       if (zoneId === "technical_log_serial_number") {
         technicalLogSerialNumber.value = value;
         technicalLogSerialNumber.classList.add("autoFilled");
@@ -1287,16 +1572,16 @@
         return;
       }
 
-      // Divide id no formato leg_INDEX_FIELD.
+      // Divide id leg_INDEX_FIELD.
       const parts = zoneId.split("_");
 
-      // Lê índice da leg.
+      // Obtém índice da leg.
       const legIndex = Number(parts[1]);
 
-      // Reconstrói campo.
+      // Reconstrói nome do campo.
       const fieldKey = parts.slice(2).join("_");
 
-      // Garante que a leg existe.
+      // Sai se leg não existir.
       if (!legs[legIndex]) {
         return;
       }
@@ -1304,18 +1589,21 @@
       // Aplica valor.
       legs[legIndex][fieldKey] = value;
 
-      // Marca como preenchido.
+      // Marca campo como OCR.
       autoFilled.add(zoneId);
     }
 
-    // Executa OCR sobre zonas.
+    // Executa OCR nas zonas indicadas.
     async function extractZones(legIndex = null) {
       if (!warpedInternalCanvas) {
         setStatus("Rectifica a folha primeiro.", true);
         return;
       }
 
-      // Filtra zonas conforme pedido.
+      // Guarda posições antes de extrair.
+      saveTemplateZones();
+
+      // Filtra zonas.
       const zones = templateZones.filter((zone) => {
         if (zone.id === "technical_log_serial_number") {
           return legIndex === null;
@@ -1338,14 +1626,14 @@
       setProgress(0, zones.length);
       setStatus("A preparar OCR...");
 
-      // Guarda worker Tesseract.
+      // Guarda worker.
       let worker = null;
 
       try {
-        // Cria worker uma vez.
+        // Cria worker Tesseract uma vez.
         worker = await Tesseract.createWorker("eng");
 
-        // Processa cada zona.
+        // Processa zona a zona.
         for (let i = 0; i < zones.length; i++) {
           const zone = zones[i];
 
@@ -1356,12 +1644,12 @@
           // Recorta zona.
           const cropCanvas = cropZoneToCanvas(zone);
 
-          // Ignora zonas inválidas.
+          // Ignora se falhar.
           if (!cropCanvas) {
             continue;
           }
 
-          // Configura caracteres permitidos.
+          // Define whitelist.
           await worker.setParameters({
             tessedit_char_whitelist: getWhitelist(zone.kind)
           });
@@ -1369,13 +1657,13 @@
           // Executa OCR.
           const result = await worker.recognize(cropCanvas);
 
-          // Mostra OCR bruto do último campo.
+          // Mostra OCR bruto.
           ocrText.value = result.data.text || "";
 
           // Limpa valor.
           const clean = cleanValue(result.data.text, zone.kind);
 
-          // Aplica valor quando não estiver vazio.
+          // Aplica se não estiver vazio.
           if (clean !== "") {
             applyExtractedValue(zone.id, clean);
           }
@@ -1391,7 +1679,7 @@
         setStatus("Extracção concluída. Confirma a tabela antes de gerar JSON.");
       } catch (error) {
         console.error(error);
-        setStatus("Erro durante OCR. Tenta melhorar margens, luz ou rectificação.", true);
+        setStatus("Erro durante OCR. Ajusta os rectângulos e tenta novamente.", true);
       } finally {
         // Termina worker.
         if (worker) {
@@ -1415,32 +1703,30 @@
 
     // Desenha tabela editável.
     function renderLegsTable() {
-      // Limpa corpo da tabela.
+      // Limpa tabela.
       legsTableBody.innerHTML = "";
 
       // Cria uma linha por leg.
       legs.forEach((leg, index) => {
         const row = document.createElement("tr");
 
-        // Cria uma célula por campo.
+        // Cria célula por campo.
         legFields.forEach((field) => {
           const cell = document.createElement("td");
           const input = document.createElement("input");
 
-          // Define valor e placeholder.
+          // Define valor.
           input.value = leg[field.key] ?? "";
           input.placeholder = field.placeholder;
-
-          // Guarda metadados.
           input.dataset.index = String(index);
           input.dataset.field = field.key;
 
-          // Aplica destaque se veio de OCR.
+          // Destaca se veio de OCR.
           if (autoFilled.has(`leg_${index}_${field.key}`)) {
             input.classList.add("autoFilled");
           }
 
-          // Actualiza dados quando editado.
+          // Actualiza modelo ao editar.
           input.addEventListener("input", (event) => {
             const rowIndex = Number(event.target.dataset.index);
             const key = event.target.dataset.field;
@@ -1458,24 +1744,22 @@
         const actionCell = document.createElement("td");
         const removeButton = document.createElement("button");
 
-        // Configura botão remover.
+        // Configura botão.
         removeButton.textContent = "Remover";
         removeButton.className = "secondary";
         removeButton.type = "button";
 
-        // Remove a leg.
+        // Remove leg.
         removeButton.addEventListener("click", () => {
           legs.splice(index, 1);
           renderLegsTable();
         });
 
-        // Adiciona botão à célula.
+        // Adiciona botão.
         actionCell.appendChild(removeButton);
-
-        // Adiciona célula à linha.
         row.appendChild(actionCell);
 
-        // Adiciona linha à tabela.
+        // Adiciona linha.
         legsTableBody.appendChild(row);
       });
     }
@@ -1487,7 +1771,7 @@
       setStatus("Nova leg adicionada.");
     });
 
-    // Limpa dados da tabela.
+    // Limpa tabela.
     clearTableBtn.addEventListener("click", () => {
       autoFilled.clear();
       technicalLogSerialNumber.value = "";
@@ -1500,13 +1784,16 @@
       setStatus("Tabela limpa.");
     });
 
-    // Limpa toda a aplicação.
+    // Limpa toda a app.
     clearAllBtn.addEventListener("click", () => {
       sourceImage = null;
       corners = [];
       activeCornerIndex = -1;
       isDraggingCorner = false;
       warpedInternalCanvas = null;
+      selectedZoneIndex = -1;
+      isDraggingZone = false;
+      updateSelectedZoneUI();
       photoInput.value = "";
       sourceCanvas.width = 0;
       sourceCanvas.height = 0;
@@ -1558,22 +1845,20 @@
       copyJsonBtn.disabled = false;
       downloadJsonBtn.disabled = false;
 
-      // Remove URL antigo se existir.
+      // Remove URL antigo.
       if (currentJsonBlobUrl) {
         URL.revokeObjectURL(currentJsonBlobUrl);
       }
 
-      // Cria Blob para download.
+      // Cria Blob.
       const blob = new Blob([json], { type: "application/json" });
-
-      // Cria URL temporário.
       currentJsonBlobUrl = URL.createObjectURL(blob);
 
       // Mostra estado.
       setStatus("JSON gerado. Confirma antes de usar na integração LEON.");
     });
 
-    // Copia JSON para a área de transferência.
+    // Copia JSON.
     copyJsonBtn.addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(jsonOutput.textContent);
@@ -1584,33 +1869,26 @@
       }
     });
 
-    // Descarrega JSON como ficheiro.
+    // Descarrega JSON.
     downloadJsonBtn.addEventListener("click", () => {
       if (!currentJsonBlobUrl) {
         return;
       }
 
-      // Usa o serial number no nome quando existir.
+      // Define nome com serial se existir.
       const serial = technicalLogSerialNumber.value.trim() || "sem-serial";
 
       // Cria link temporário.
       const link = document.createElement("a");
-
-      // Define URL.
       link.href = currentJsonBlobUrl;
-
-      // Define nome.
       link.download = `atl-${serial}.json`;
-
-      // Adiciona link ao DOM.
       document.body.appendChild(link);
-
-      // Simula clique.
       link.click();
-
-      // Remove link.
       link.remove();
     });
+
+    // Inicializa estado visual da zona seleccionada.
+    updateSelectedZoneUI();
   </script>
 </body>
 </html>

@@ -5,6 +5,7 @@
   <circle cx="384" cy="132" r="24" fill="#f59e0b"/>
   <circle cx="356" cy="378" r="24" fill="#f59e0b"/>
   <circle cx="156" cy="378" r="24" fill="#f59e0b"/>
-  <path d="M190 216h140M190 276h140M190 336h92" stroke="#0f172a" stroke-width="20" stroke-linecap="round"/>
+  <rect x="190" y="218" width="150" height="48" rx="8" fill="none" stroke="#2563eb" stroke-width="16"/>
+  <rect x="190" y="310" width="102" height="48" rx="8" fill="none" stroke="#22c55e" stroke-width="16"/>
   <text x="256" y="458" font-family="Arial, sans-serif" font-size="56" font-weight="700" text-anchor="middle" fill="#ffffff">ATL</text>
 </svg>

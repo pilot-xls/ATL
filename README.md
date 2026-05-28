@@ -1,17 +1,31 @@
-# ATL Extractor V1.3
+# ATL Extractor V1.4
 
-Versão com modo scanner:
+Versão com:
 
-1. Tira ou carrega uma fotografia.
-2. Arrasta os quatro cantos para as margens da folha.
-3. Rectifica a perspectiva.
-4. Aplica OCR por template fixo.
-5. Confirma a tabela editável.
-6. Gera JSON.
+1. Foto.
+2. Ajuste dos quatro cantos da folha.
+3. Rectificação de perspectiva.
+4. Rectângulos OCR arrastáveis com o dedo.
+5. Posições guardadas no dispositivo.
+6. OCR por template.
+7. Tabela editável.
+8. JSON final.
 
-## Publicação no GitHub Pages
+## Como usar
 
-Coloca estes ficheiros na raiz do repositório:
+1. Carrega/tira foto.
+2. Arrasta os quatro pontos amarelos para os cantos da folha.
+3. Carrega em `Rectificar folha`.
+4. Arrasta os rectângulos azuis/verdes para cima dos campos certos.
+5. Opcional: toca num rectângulo e usa `Mais larga`, `Menos larga`, `Mais alta`, `Menos alta`.
+6. Carrega em `Guardar posições`.
+7. Carrega em `Extrair tudo`.
+8. Corrige a tabela.
+9. Gera o JSON.
+
+## Publicar no GitHub Pages
+
+Coloca os ficheiros na raiz do repositório:
 
 ```text
 index.html
@@ -23,7 +37,7 @@ icons/
   icon-512.svg
 ```
 
-Depois activa:
+Depois:
 
 ```text
 Settings → Pages → Deploy from a branch → main → /root
@@ -31,8 +45,7 @@ Settings → Pages → Deploy from a branch → main → /root
 
 ## Notas
 
-- A rectificação é feita no browser, sem servidor.
-- O OCR continua a ser gratuito com Tesseract.js.
-- A confirmação humana continua a ser obrigatória.
+- As posições dos rectângulos ficam guardadas no `localStorage` do dispositivo.
+- Se apagares dados do browser, as posições voltam ao padrão.
+- A confirmação manual continua a ser obrigatória.
 - Esta versão ainda não envia para a API LEON.
-- O próximo passo é afinar as coordenadas do template com 10 a 20 folhas reais.

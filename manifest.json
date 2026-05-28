@@ -1,7 +1,7 @@
 {
-  "name": "ATL Extractor V1.3",
-  "short_name": "ATL V1.3",
-  "description": "PWA para extrair dados de Aircraft Technical Log com margens manuais, rectificação de perspectiva, OCR e JSON.",
+  "name": "ATL Extractor V1.4",
+  "short_name": "ATL V1.4",
+  "description": "PWA para extrair dados de Aircraft Technical Log com margens manuais, rectificação, rectângulos OCR arrastáveis e JSON.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
