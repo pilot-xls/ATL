@@ -1,29 +1,17 @@
-# ATL Extractor V1.1
+# ATL Extractor V1.3
 
-Esta versão substitui a tentativa de ler a folha inteira por um modo mais prático:
+Versão com modo scanner:
 
-- Carregar/tirar fotografia.
-- Seleccionar uma zona pequena da imagem.
-- Escolher o campo a preencher.
-- Fazer OCR só nessa zona.
-- Confirmar na tabela editável.
-- Gerar JSON.
+1. Tira ou carrega uma fotografia.
+2. Arrasta os quatro cantos para as margens da folha.
+3. Rectifica a perspectiva.
+4. Aplica OCR por template fixo.
+5. Confirma a tabela editável.
+6. Gera JSON.
 
-## Porque esta versão existe
+## Publicação no GitHub Pages
 
-A V1 lia a folha inteira e isso gerava muitos erros devido a:
-
-- escrita manual;
-- sombras;
-- grelha da folha;
-- campos pequenos;
-- texto impresso a misturar-se com valores manuscritos.
-
-A V1.1 permite recortar visualmente apenas a célula pretendida antes de fazer OCR.
-
-## Como publicar no GitHub Pages
-
-A estrutura deve ficar na raiz do repositório:
+Coloca estes ficheiros na raiz do repositório:
 
 ```text
 index.html
@@ -35,28 +23,16 @@ icons/
   icon-512.svg
 ```
 
-No GitHub:
+Depois activa:
 
-1. Abre o repositório.
-2. Vai a **Settings**.
-3. Entra em **Pages**.
-4. Escolhe **Deploy from a branch**.
-5. Escolhe branch `main`.
-6. Escolhe pasta `/root`.
+```text
+Settings → Pages → Deploy from a branch → main → /root
+```
 
-## Como usar
+## Notas
 
-1. Abre a app no telemóvel.
-2. Tira/carrega foto da folha.
-3. Escolhe o campo destino, por exemplo `Leg 1 · A.T.D`.
-4. Arrasta um rectângulo sobre a célula correspondente na imagem.
-5. Carrega em **OCR da selecção**.
-6. Confirma/corrige a tabela.
-7. Carrega em **Confirmar e gerar JSON**.
-
-## Limitações
-
-- Continua a usar OCR gratuito no browser.
-- Não é fiável para envio automático sem confirmação humana.
-- Ainda não envia para a API LEON.
-- A próxima versão pode ter grelha fixa por template para automatizar mais.
+- A rectificação é feita no browser, sem servidor.
+- O OCR continua a ser gratuito com Tesseract.js.
+- A confirmação humana continua a ser obrigatória.
+- Esta versão ainda não envia para a API LEON.
+- O próximo passo é afinar as coordenadas do template com 10 a 20 folhas reais.
