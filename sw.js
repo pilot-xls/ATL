@@ -1,61 +1,48 @@
-# ATL Extractor V1
+// Define o nome da cache desta versão da PWA.
+const CACHE_NAME = "atl-extractor-v1";
 
-PWA simples para:
+// Lista os ficheiros locais que devem ficar em cache.
+const LOCAL_ASSETS = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./icons/icon-192.svg",
+  "./icons/icon-512.svg"
+];
 
-1. Tirar/carregar fotografia do Aircraft Technical Log.
-2. Fazer OCR gratuito no browser com Tesseract.js.
-3. Tentar extrair:
-   - technical_log_serial_number
-   - station_departure
-   - station_arrival
-   - off_blk
-   - A.T.D
-   - A.T.A
-   - on_blk
-   - pax
-   - trans
-   - delay_code
-   - refuel
-   - depart
-   - arrival
-4. Mostrar tabela editável.
-5. Confirmar e gerar JSON.
+// Instala o service worker e guarda ficheiros locais em cache.
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(LOCAL_ASSETS);
+    })
+  );
+});
 
-## Como testar localmente
+// Activa o service worker e remove caches antigas.
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
+      );
+    })
+  );
+});
 
-Abre a pasta do projecto e corre um servidor local.
+// Intercepta pedidos e tenta responder primeiro pela cache.
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      // Devolve a resposta em cache quando existir.
+      if (cachedResponse) {
+        return cachedResponse;
+      }
 
-Com Python:
-
-```bash
-# Entra na pasta do projecto.
-cd atl-pwa-v1
-
-# Inicia um servidor local simples na porta 8000.
-python3 -m http.server 8000
-```
-
-Depois abre:
-
-```text
-http://localhost:8000
-```
-
-## Como publicar no GitHub Pages
-
-1. Cria um repositório no GitHub.
-2. Envia estes ficheiros para o repositório.
-3. Vai a **Settings → Pages**.
-4. Em **Build and deployment**, escolhe:
-   - Source: `Deploy from a branch`
-   - Branch: `main`
-   - Folder: `/root`
-5. Abre o URL gerado pelo GitHub Pages.
-
-## Limitações desta V1
-
-- O OCR gratuito pode falhar em escrita manual.
-- A tabela é preenchida por heurísticas simples.
-- A confirmação humana é obrigatória.
-- Ainda não envia para a API LEON.
-- A próxima versão deve usar zonas fixas da folha para melhorar a extracção.
+      // Caso contrário, faz o pedido normal à rede.
+      return fetch(event.request);
+    })
+  );
+});
