@@ -1,61 +1,62 @@
-# ATL Extractor V1
+# ATL Extractor V1.1
 
-PWA simples para:
+Esta versão substitui a tentativa de ler a folha inteira por um modo mais prático:
 
-1. Tirar/carregar fotografia do Aircraft Technical Log.
-2. Fazer OCR gratuito no browser com Tesseract.js.
-3. Tentar extrair:
-   - technical_log_serial_number
-   - station_departure
-   - station_arrival
-   - off_blk
-   - A.T.D
-   - A.T.A
-   - on_blk
-   - pax
-   - trans
-   - delay_code
-   - refuel
-   - depart
-   - arrival
-4. Mostrar tabela editável.
-5. Confirmar e gerar JSON.
+- Carregar/tirar fotografia.
+- Seleccionar uma zona pequena da imagem.
+- Escolher o campo a preencher.
+- Fazer OCR só nessa zona.
+- Confirmar na tabela editável.
+- Gerar JSON.
 
-## Como testar localmente
+## Porque esta versão existe
 
-Abre a pasta do projecto e corre um servidor local.
+A V1 lia a folha inteira e isso gerava muitos erros devido a:
 
-Com Python:
+- escrita manual;
+- sombras;
+- grelha da folha;
+- campos pequenos;
+- texto impresso a misturar-se com valores manuscritos.
 
-```bash
-# Entra na pasta do projecto.
-cd atl-pwa-v1
-
-# Inicia um servidor local simples na porta 8000.
-python3 -m http.server 8000
-```
-
-Depois abre:
-
-```text
-http://localhost:8000
-```
+A V1.1 permite recortar visualmente apenas a célula pretendida antes de fazer OCR.
 
 ## Como publicar no GitHub Pages
 
-1. Cria um repositório no GitHub.
-2. Envia estes ficheiros para o repositório.
-3. Vai a **Settings → Pages**.
-4. Em **Build and deployment**, escolhe:
-   - Source: `Deploy from a branch`
-   - Branch: `main`
-   - Folder: `/root`
-5. Abre o URL gerado pelo GitHub Pages.
+A estrutura deve ficar na raiz do repositório:
 
-## Limitações desta V1
+```text
+index.html
+manifest.json
+sw.js
+README.md
+icons/
+  icon-192.svg
+  icon-512.svg
+```
 
-- O OCR gratuito pode falhar em escrita manual.
-- A tabela é preenchida por heurísticas simples.
-- A confirmação humana é obrigatória.
+No GitHub:
+
+1. Abre o repositório.
+2. Vai a **Settings**.
+3. Entra em **Pages**.
+4. Escolhe **Deploy from a branch**.
+5. Escolhe branch `main`.
+6. Escolhe pasta `/root`.
+
+## Como usar
+
+1. Abre a app no telemóvel.
+2. Tira/carrega foto da folha.
+3. Escolhe o campo destino, por exemplo `Leg 1 · A.T.D`.
+4. Arrasta um rectângulo sobre a célula correspondente na imagem.
+5. Carrega em **OCR da selecção**.
+6. Confirma/corrige a tabela.
+7. Carrega em **Confirmar e gerar JSON**.
+
+## Limitações
+
+- Continua a usar OCR gratuito no browser.
+- Não é fiável para envio automático sem confirmação humana.
 - Ainda não envia para a API LEON.
-- A próxima versão deve usar zonas fixas da folha para melhorar a extracção.
+- A próxima versão pode ter grelha fixa por template para automatizar mais.

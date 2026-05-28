@@ -1,7 +1,7 @@
 // Define o nome da cache desta versão da PWA.
-const CACHE_NAME = "atl-extractor-v2";
+const CACHE_NAME = "atl-extractor-v1-1";
 
-// Lista os ficheiros locais que devem ficar em cache.
+// Lista ficheiros locais que devem ficar guardados em cache.
 const LOCAL_ASSETS = [
   "./",
   "./index.html",
@@ -10,7 +10,7 @@ const LOCAL_ASSETS = [
   "./icons/icon-512.svg"
 ];
 
-// Instala o service worker e guarda ficheiros locais em cache.
+// Instala o service worker e guarda recursos locais.
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -32,16 +32,16 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Intercepta pedidos e tenta responder primeiro pela cache.
+// Intercepta pedidos e usa cache quando possível.
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Devolve a resposta em cache quando existir.
+      // Devolve resposta em cache quando existe.
       if (cachedResponse) {
         return cachedResponse;
       }
 
-      // Caso contrário, faz o pedido normal à rede.
+      // Caso contrário, faz pedido normal à rede.
       return fetch(event.request);
     })
   );

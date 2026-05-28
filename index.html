@@ -1,90 +1,96 @@
 <!doctype html>
 <html lang="pt-PT">
 <head>
-  <!-- Define a codificação para aceitar acentos e símbolos portugueses. -->
+  <!-- Define a codificação para permitir acentos, símbolos e texto português. -->
   <meta charset="utf-8" />
 
-  <!-- Faz a página adaptar-se correctamente ao ecrã do telemóvel. -->
+  <!-- Faz a app adaptar-se ao ecrã do telemóvel. -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Define a cor principal usada pelo browser quando a app é instalada. -->
+  <!-- Define a cor principal usada pelo browser quando a PWA é instalada. -->
   <meta name="theme-color" content="#111827" />
 
-  <!-- Liga o manifesto PWA para permitir instalação no telemóvel. -->
+  <!-- Liga o manifesto PWA para permitir instalação no ecrã principal. -->
   <link rel="manifest" href="./manifest.json" />
 
-  <!-- Define o título da aplicação. -->
-  <title>ATL Extractor V1</title>
+  <!-- Define o título da aplicação no browser. -->
+  <title>ATL Extractor V1.1</title>
 
-  <!-- Carrega o Tesseract.js por CDN para fazer OCR gratuito no browser. -->
+  <!-- Carrega o Tesseract.js para fazer OCR gratuito no browser. -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <style>
-    /* Define uma base visual simples e legível no telemóvel. */
+    /* Define a base visual da aplicação. */
     :root {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #111827;
       background: #f3f4f6;
     }
 
-    /* Remove margens padrão e usa fundo cinzento claro. */
+    /* Remove margens padrão do browser. */
     body {
       margin: 0;
       background: #f3f4f6;
     }
 
-    /* Cria uma área central com largura controlada. */
+    /* Limita a largura da aplicação para ficar legível também em desktop. */
     .app {
-      max-width: 1100px;
+      max-width: 1180px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 14px;
     }
 
-    /* Estiliza o cabeçalho principal da app. */
+    /* Estiliza o cabeçalho principal. */
     header {
       background: #111827;
       color: white;
       padding: 16px;
       border-radius: 16px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
-    /* Remove margens excessivas do título. */
+    /* Ajusta o título principal. */
     h1 {
       margin: 0 0 6px;
-      font-size: 1.4rem;
+      font-size: 1.35rem;
     }
 
-    /* Mostra uma descrição curta com contraste reduzido. */
+    /* Ajusta subtítulos de cartões. */
+    h2 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+    }
+
+    /* Mostra texto secundário com menor contraste. */
     .subtitle {
       margin: 0;
       color: #d1d5db;
       font-size: 0.95rem;
     }
 
-    /* Cria cartões brancos para cada secção. */
+    /* Cria cartões brancos para separar as secções. */
     .card {
       background: white;
       border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 16px;
+      padding: 14px;
+      margin-bottom: 14px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
-    /* Organiza botões e controlos com espaçamento. */
+    /* Organiza botões e controlos na mesma linha quando possível. */
     .actions {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       align-items: center;
-      margin-top: 12px;
+      margin-top: 10px;
     }
 
     /* Estiliza botões principais. */
     button {
       border: 0;
       border-radius: 10px;
-      padding: 10px 14px;
+      padding: 10px 13px;
       background: #111827;
       color: white;
       font-weight: 650;
@@ -97,13 +103,19 @@
       color: #111827;
     }
 
-    /* Desactiva visualmente botões indisponíveis. */
+    /* Estiliza botões de perigo para remover dados. */
+    button.danger {
+      background: #991b1b;
+      color: white;
+    }
+
+    /* Mostra botões desactivados com menor opacidade. */
     button:disabled {
       opacity: 0.45;
       cursor: not-allowed;
     }
 
-    /* Estiliza inputs e textareas. */
+    /* Define aparência comum dos campos. */
     input, textarea, select {
       width: 100%;
       box-sizing: border-box;
@@ -114,39 +126,71 @@
       background: white;
     }
 
-    /* Dá altura útil ao texto OCR bruto. */
+    /* Dá altura útil ao texto OCR. */
     textarea {
-      min-height: 150px;
+      min-height: 130px;
       resize: vertical;
       white-space: pre-wrap;
     }
 
-    /* Mostra a fotografia carregada sem rebentar o layout. */
-    #preview {
-      width: 100%;
-      max-height: 480px;
-      object-fit: contain;
+    /* Mostra notas auxiliares com contraste reduzido. */
+    .note {
+      color: #4b5563;
+      font-size: 0.92rem;
+      line-height: 1.35;
+      margin: 6px 0 10px;
+    }
+
+    /* Mostra avisos curtos em destaque. */
+    .warning {
+      background: #fffbeb;
+      color: #78350f;
+      border: 1px solid #fde68a;
+      padding: 10px;
       border-radius: 12px;
-      background: #111827;
-      margin-top: 12px;
+      font-size: 0.92rem;
+      margin-top: 8px;
+    }
+
+    /* Mostra mensagens de estado do sistema. */
+    .status {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #eef2ff;
+      color: #312e81;
+      margin-top: 10px;
+      font-size: 0.95rem;
       display: none;
     }
 
-    /* Cria uma grelha de campos para os dados gerais. */
+    /* Mostra erros em vermelho. */
+    .error {
+      background: #fee2e2;
+      color: #7f1d1d;
+    }
+
+    /* Cria uma grelha responsiva para campos. */
     .grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
     }
 
-    /* Em ecrãs pequenos, passa a grelha para uma coluna. */
-    @media (max-width: 720px) {
+    /* Em telemóveis, coloca a grelha numa única coluna. */
+    @media (max-width: 760px) {
       .grid {
         grid-template-columns: 1fr;
       }
     }
 
-    /* Permite rolar a tabela horizontalmente no telemóvel. */
+    /* Define labels legíveis. */
+    label {
+      display: block;
+      font-weight: 650;
+      margin-bottom: 6px;
+    }
+
+    /* Cria uma área com scroll horizontal para a tabela. */
     .table-wrap {
       overflow-x: auto;
       border: 1px solid #e5e7eb;
@@ -156,7 +200,7 @@
     /* Define a tabela editável. */
     table {
       width: 100%;
-      min-width: 1000px;
+      min-width: 1080px;
       border-collapse: collapse;
       background: white;
     }
@@ -168,22 +212,22 @@
       padding: 6px;
       text-align: left;
       vertical-align: top;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
 
-    /* Fixa um cabeçalho visual claro. */
+    /* Dá fundo claro ao cabeçalho da tabela. */
     th {
       background: #f9fafb;
       font-weight: 700;
       white-space: nowrap;
     }
 
-    /* Remove a borda direita na última coluna. */
+    /* Remove a borda direita na última célula. */
     th:last-child, td:last-child {
       border-right: 0;
     }
 
-    /* Faz os inputs da tabela ocuparem a célula toda. */
+    /* Faz inputs da tabela ocuparem a célula inteira. */
     td input {
       border: 0;
       border-radius: 6px;
@@ -191,24 +235,52 @@
       background: #f9fafb;
     }
 
-    /* Destaca mensagens de estado. */
-    .status {
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: #eef2ff;
-      color: #312e81;
-      margin-top: 12px;
-      font-size: 0.95rem;
+    /* Cria a área da imagem com canvas e overlay. */
+    .image-stage {
+      position: relative;
+      width: 100%;
+      max-height: 72vh;
+      overflow: auto;
+      border-radius: 12px;
+      background: #111827;
+      border: 1px solid #d1d5db;
+      margin-top: 10px;
+      touch-action: none;
+    }
+
+    /* Define o canvas onde a foto é desenhada. */
+    #imageCanvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      cursor: crosshair;
+    }
+
+    /* Define o rectângulo visual de selecção por zona. */
+    #selectionBox {
+      position: absolute;
+      border: 2px solid #22c55e;
+      background: rgba(34, 197, 94, 0.15);
       display: none;
+      pointer-events: none;
+      box-sizing: border-box;
     }
 
-    /* Mostra erros de forma visível. */
-    .error {
-      background: #fee2e2;
-      color: #7f1d1d;
+    /* Organiza controlos pequenos lado a lado. */
+    .controls-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
     }
 
-    /* Estiliza o bloco JSON final. */
+    /* Ajusta controlos em telemóvel. */
+    @media (max-width: 900px) {
+      .controls-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Define o estilo do resultado JSON. */
     pre {
       margin: 0;
       padding: 12px;
@@ -216,84 +288,132 @@
       color: #e5e7eb;
       border-radius: 12px;
       overflow: auto;
-      min-height: 160px;
+      min-height: 150px;
     }
 
-    /* Reduz visualmente notas auxiliares. */
-    .note {
-      color: #4b5563;
-      font-size: 0.92rem;
-      line-height: 1.35;
+    /* Define uma linha discreta para dados auxiliares. */
+    .mini {
+      font-size: 0.85rem;
+      color: #6b7280;
     }
 
-    /* Cria um pequeno separador visual para cada label. */
-    label {
-      display: block;
-      font-weight: 650;
-      margin-bottom: 6px;
-    }
-
-    /* Estiliza campos pequenos de controlo. */
-    .small-field {
-      max-width: 140px;
+    /* Garante que código inline não fica com tamanho excessivo. */
+    code {
+      font-size: 0.9em;
     }
   </style>
 </head>
 <body>
-  <!-- Container principal da aplicação. -->
+  <!-- Container principal da PWA. -->
   <main class="app">
-    <!-- Cabeçalho com nome e objectivo da ferramenta. -->
+    <!-- Cabeçalho da aplicação. -->
     <header>
-      <h1>ATL Extractor V1</h1>
-      <p class="subtitle">Extrai dados básicos de Aircraft Technical Log, permite confirmar e gera JSON.</p>
+      <h1>ATL Extractor V1.1</h1>
+      <p class="subtitle">Versão com OCR por zona: selecciona uma célula da foto, escolhe o campo e preenche a tabela.</p>
     </header>
 
-    <!-- Secção para tirar/carregar fotografia. -->
+    <!-- Aviso sobre a limitação do OCR gratuito em escrita manual. -->
     <section class="card">
-      <h2>1. Tirar ou carregar fotografia</h2>
+      <h2>Nota operacional</h2>
       <p class="note">
-        Usa uma fotografia com a folha inteira visível, o mais direita possível e com pouca sombra.
-        Esta primeira versão usa OCR gratuito no browser e deve ser sempre confirmada manualmente.
+        A leitura da folha inteira gera muitos erros porque há escrita manual, sombras, grelhas e texto impresso.
+        Esta versão deixa-te seleccionar zonas pequenas da imagem para reduzir ruído.
       </p>
+      <div class="warning">
+        Para melhores resultados: amplia a foto, selecciona só a célula pretendida e confirma sempre os valores antes de gerar JSON.
+      </div>
+    </section>
 
-      <!-- Input de ficheiro com capture para abrir a câmara no telemóvel quando suportado. -->
+    <!-- Secção de imagem e OCR por zona. -->
+    <section class="card">
+      <h2>1. Foto e OCR por zona</h2>
+
+      <!-- Input para tirar ou carregar fotografia. -->
       <input id="photoInput" type="file" accept="image/*" capture="environment" />
 
-      <!-- Pré-visualização da imagem escolhida. -->
-      <img id="preview" alt="Pré-visualização do Technical Log" />
+      <!-- Controlos para escolher o destino do OCR. -->
+      <div class="controls-row" style="margin-top: 12px;">
+        <div>
+          <label for="targetField">Campo a preencher</label>
+          <select id="targetField"></select>
+        </div>
 
-      <!-- Botões de acção da secção de imagem. -->
-      <div class="actions">
-        <button id="runOcrBtn" disabled>Extrair por OCR</button>
-        <button id="clearBtn" class="secondary">Limpar</button>
+        <div>
+          <label for="ocrMode">Tipo de OCR</label>
+          <select id="ocrMode">
+            <option value="auto">Automático</option>
+            <option value="time">Hora</option>
+            <option value="number">Número</option>
+            <option value="station">Estação</option>
+            <option value="text">Texto</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="preprocessMode">Pré-processamento</label>
+          <select id="preprocessMode">
+            <option value="strong">Forte</option>
+            <option value="medium">Médio</option>
+            <option value="none">Nenhum</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="zoomLevel">Zoom</label>
+          <select id="zoomLevel">
+            <option value="1">100%</option>
+            <option value="1.5">150%</option>
+            <option value="2">200%</option>
+            <option value="2.5">250%</option>
+          </select>
+        </div>
       </div>
 
-      <!-- Mensagem de estado do OCR. -->
+      <!-- Botões para OCR da selecção ou folha completa. -->
+      <div class="actions">
+        <button id="ocrSelectionBtn" disabled>OCR da selecção</button>
+        <button id="ocrFullBtn" class="secondary" disabled>OCR folha inteira</button>
+        <button id="clearSelectionBtn" class="secondary" disabled>Limpar selecção</button>
+        <button id="clearAllBtn" class="danger">Limpar tudo</button>
+      </div>
+
+      <!-- Mensagem de estado. -->
       <div id="status" class="status"></div>
+
+      <!-- Área visual onde o utilizador selecciona a zona da imagem. -->
+      <div class="image-stage" id="imageStage">
+        <canvas id="imageCanvas"></canvas>
+        <div id="selectionBox"></div>
+      </div>
+
+      <!-- Texto auxiliar com instrução curta. -->
+      <p class="mini">
+        Arrasta sobre a célula pretendida. Em telemóvel, usa o dedo para marcar o rectângulo.
+      </p>
     </section>
 
-    <!-- Secção com texto OCR bruto para auditoria/correcção. -->
+    <!-- Secção com OCR bruto e limpeza manual. -->
     <section class="card">
-      <h2>2. Texto lido pela OCR</h2>
+      <h2>2. Texto OCR bruto</h2>
       <p class="note">
-        Podes corrigir este texto antes de aplicar as heurísticas. Isto ajuda quando a OCR lê mal um número ou uma estação.
+        O texto aparece aqui depois de cada OCR. Podes copiar, corrigir ou usar como referência.
       </p>
 
-      <!-- Área editável onde fica o texto extraído. -->
-      <textarea id="ocrText" placeholder="O texto OCR aparece aqui..."></textarea>
+      <!-- Caixa de texto com o último resultado OCR. -->
+      <textarea id="ocrText" placeholder="Resultado OCR..."></textarea>
 
-      <!-- Botões para preencher dados a partir do texto ou manualmente. -->
+      <!-- Botões para aplicar o texto ao campo seleccionado. -->
       <div class="actions">
-        <button id="parseBtn" class="secondary">Aplicar heurísticas</button>
-        <button id="addLegBtn" class="secondary">Adicionar leg</button>
+        <button id="applyTextBtn" class="secondary">Aplicar texto ao campo escolhido</button>
+        <button id="cleanTextBtn" class="secondary">Limpar texto OCR</button>
       </div>
     </section>
 
-    <!-- Secção dos dados gerais da folha. -->
+    <!-- Secção dos dados gerais. -->
     <section class="card">
       <h2>3. Dados gerais</h2>
 
-      <!-- Campos que pertencem à folha inteira e não a uma leg específica. -->
+      <!-- Campos que pertencem à folha inteira. -->
       <div class="grid">
         <div>
           <label for="technicalLogSerialNumber">Technical Log Serial Number</label>
@@ -302,14 +422,14 @@
       </div>
     </section>
 
-    <!-- Secção com tabela editável por leg. -->
+    <!-- Secção da tabela editável. -->
     <section class="card">
       <h2>4. Tabela editável</h2>
       <p class="note">
-        Confirma cada célula antes de gerar o JSON. Campos vazios ficam como <code>null</code>.
+        A OCR só ajuda a preencher. A confirmação manual continua a ser obrigatória.
       </p>
 
-      <!-- Tabela com scroll horizontal para ecrãs pequenos. -->
+      <!-- Tabela com scroll horizontal. -->
       <div class="table-wrap">
         <table>
           <thead>
@@ -331,20 +451,21 @@
             </tr>
           </thead>
 
-          <!-- Corpo da tabela preenchido por JavaScript. -->
+          <!-- Corpo da tabela criado por JavaScript. -->
           <tbody id="legsTableBody"></tbody>
         </table>
       </div>
 
-      <!-- Botões de confirmação e geração de JSON. -->
+      <!-- Botões da tabela e JSON. -->
       <div class="actions">
+        <button id="addLegBtn" class="secondary">Adicionar leg</button>
         <button id="generateJsonBtn">Confirmar e gerar JSON</button>
         <button id="copyJsonBtn" class="secondary" disabled>Copiar JSON</button>
         <button id="downloadJsonBtn" class="secondary" disabled>Descarregar JSON</button>
       </div>
     </section>
 
-    <!-- Secção com o JSON final. -->
+    <!-- Secção do JSON final. -->
     <section class="card">
       <h2>5. JSON final</h2>
       <pre id="jsonOutput">{}</pre>
@@ -352,52 +473,73 @@
   </main>
 
   <script>
-    // Guarda a imagem actualmente carregada em memória.
-    let currentImageDataUrl = null;
+    // Guarda a imagem original carregada pelo utilizador.
+    let originalImage = null;
 
-    // Guarda o object URL usado para descarregar JSON.
+    // Guarda a escala actual usada no canvas.
+    let currentScale = 1;
+
+    // Guarda a selecção actual em coordenadas do canvas.
+    let selection = null;
+
+    // Indica se o utilizador está a arrastar uma selecção.
+    let isSelecting = false;
+
+    // Guarda o ponto inicial da selecção.
+    let selectionStart = { x: 0, y: 0 };
+
+    // Guarda o URL do Blob usado para descarregar o JSON.
     let currentJsonBlobUrl = null;
 
-    // Selecciona elementos do DOM usados várias vezes.
+    // Selecciona elementos do DOM usados pela aplicação.
     const photoInput = document.getElementById("photoInput");
-    const preview = document.getElementById("preview");
-    const runOcrBtn = document.getElementById("runOcrBtn");
-    const clearBtn = document.getElementById("clearBtn");
+    const imageStage = document.getElementById("imageStage");
+    const imageCanvas = document.getElementById("imageCanvas");
+    const selectionBox = document.getElementById("selectionBox");
+    const targetField = document.getElementById("targetField");
+    const ocrMode = document.getElementById("ocrMode");
+    const preprocessMode = document.getElementById("preprocessMode");
+    const zoomLevel = document.getElementById("zoomLevel");
+    const ocrSelectionBtn = document.getElementById("ocrSelectionBtn");
+    const ocrFullBtn = document.getElementById("ocrFullBtn");
+    const clearSelectionBtn = document.getElementById("clearSelectionBtn");
+    const clearAllBtn = document.getElementById("clearAllBtn");
     const statusBox = document.getElementById("status");
     const ocrText = document.getElementById("ocrText");
-    const parseBtn = document.getElementById("parseBtn");
-    const addLegBtn = document.getElementById("addLegBtn");
+    const applyTextBtn = document.getElementById("applyTextBtn");
+    const cleanTextBtn = document.getElementById("cleanTextBtn");
     const technicalLogSerialNumber = document.getElementById("technicalLogSerialNumber");
     const legsTableBody = document.getElementById("legsTableBody");
+    const addLegBtn = document.getElementById("addLegBtn");
     const generateJsonBtn = document.getElementById("generateJsonBtn");
     const copyJsonBtn = document.getElementById("copyJsonBtn");
     const downloadJsonBtn = document.getElementById("downloadJsonBtn");
     const jsonOutput = document.getElementById("jsonOutput");
 
+    // Obtém o contexto 2D do canvas para desenhar e processar a imagem.
+    const ctx = imageCanvas.getContext("2d", { willReadFrequently: true });
+
     // Define os campos por leg e os respectivos placeholders.
     const legFields = [
-      { key: "leg", label: "Leg", placeholder: "1" },
-      { key: "refuel", label: "Refuel", placeholder: "222" },
-      { key: "depart", label: "Depart", placeholder: "260" },
-      { key: "arrival", label: "Arrival", placeholder: "260" },
-      { key: "station_departure", label: "Station Departure", placeholder: "BGC" },
-      { key: "station_arrival", label: "Station Arrival", placeholder: "NAL" },
-      { key: "off_blk", label: "Off BLK", placeholder: "13:15" },
-      { key: "atd", label: "A.T.D", placeholder: "13:30" },
-      { key: "ata", label: "A.T.A", placeholder: "13:40" },
-      { key: "on_blk", label: "On BLK", placeholder: "13:45" },
-      { key: "pax", label: "PAX", placeholder: "6" },
-      { key: "trans", label: "Trans", placeholder: "0" },
-      { key: "delay_code", label: "Delay Cod.", placeholder: "93" }
+      { key: "leg", label: "Leg", placeholder: "1", kind: "number" },
+      { key: "refuel", label: "Refuel", placeholder: "222", kind: "number" },
+      { key: "depart", label: "Depart", placeholder: "260", kind: "number" },
+      { key: "arrival", label: "Arrival", placeholder: "260", kind: "number" },
+      { key: "station_departure", label: "Station Departure", placeholder: "BGC", kind: "station" },
+      { key: "station_arrival", label: "Station Arrival", placeholder: "NAL", kind: "station" },
+      { key: "off_blk", label: "Off BLK", placeholder: "13:15", kind: "time" },
+      { key: "atd", label: "A.T.D", placeholder: "13:30", kind: "time" },
+      { key: "ata", label: "A.T.A", placeholder: "13:40", kind: "time" },
+      { key: "on_blk", label: "On BLK", placeholder: "13:45", kind: "time" },
+      { key: "pax", label: "PAX", placeholder: "6", kind: "number" },
+      { key: "trans", label: "Trans", placeholder: "0", kind: "number" },
+      { key: "delay_code", label: "Delay Cod.", placeholder: "93", kind: "text" }
     ];
 
-    // Cria quatro legs vazias ao arrancar, porque o formulário costuma ter várias linhas.
+    // Cria quatro legs iniciais para corresponder ao uso mais comum da folha.
     const legs = [createEmptyLeg(1), createEmptyLeg(2), createEmptyLeg(3), createEmptyLeg(4)];
 
-    // Desenha a tabela inicial.
-    renderLegsTable();
-
-    // Regista o service worker para permitir instalação PWA e cache básico.
+    // Regista o service worker para tornar a app instalável.
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("./sw.js").catch((error) => {
@@ -406,13 +548,41 @@
       });
     }
 
-    // Converte uma string vazia em null, mantendo valores preenchidos.
-    function emptyToNull(value) {
-      const clean = String(value ?? "").trim();
-      return clean === "" ? null : clean;
+    // Inicializa a tabela e a lista de campos quando a página carrega.
+    initialise();
+
+    // Faz a inicialização visual da app.
+    function initialise() {
+      populateTargetFieldOptions();
+      renderLegsTable();
+      setStatus("");
     }
 
-    // Cria um objecto vazio para uma leg específica.
+    // Preenche o select de campos que podem receber OCR.
+    function populateTargetFieldOptions() {
+      targetField.innerHTML = "";
+
+      // Adiciona o campo global do serial number.
+      addTargetOption("technical_log_serial_number", "Technical Log Serial Number", "number");
+
+      // Adiciona todos os campos de cada leg.
+      legs.forEach((leg, legIndex) => {
+        legFields.forEach((field) => {
+          addTargetOption(`leg_${legIndex}_${field.key}`, `Leg ${legIndex + 1} · ${field.label}`, field.kind);
+        });
+      });
+    }
+
+    // Adiciona uma opção ao select de destino OCR.
+    function addTargetOption(value, label, kind) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      option.dataset.kind = kind;
+      targetField.appendChild(option);
+    }
+
+    // Cria uma leg vazia.
     function createEmptyLeg(legNumber) {
       return {
         leg: String(legNumber),
@@ -431,283 +601,679 @@
       };
     }
 
-    // Mostra uma mensagem de estado na interface.
+    // Mostra uma mensagem de estado.
     function setStatus(message, isError = false) {
       statusBox.textContent = message;
       statusBox.classList.toggle("error", isError);
       statusBox.style.display = message ? "block" : "none";
     }
 
-    // Normaliza texto OCR para facilitar as pesquisas por regex.
-    function normaliseText(text) {
-      return String(text || "")
-        .replace(/[|]/g, " ")
-        .replace(/[“”]/g, '"')
-        .replace(/[’]/g, "'")
-        .replace(/[^\S\r\n]+/g, " ")
-        .trim();
+    // Converte texto vazio em null para o JSON final.
+    function emptyToNull(value) {
+      const clean = String(value ?? "").trim();
+      return clean === "" ? null : clean;
     }
 
-    // Tenta encontrar o Technical Log Serial Number no texto OCR.
-    function extractTechnicalLogSerial(text) {
-      const clean = normaliseText(text);
-
-      // Procura padrões comuns perto das palavras "serial number".
-      const serialMatch =
-        clean.match(/serial\s*number[^0-9]{0,30}([0-9]{3,6})/i) ||
-        clean.match(/technical\s*log[^0-9]{0,40}([0-9]{3,6})/i) ||
-        clean.match(/\b0[0-9]{3,5}\b/);
-
-      // Devolve o primeiro número encontrado ou texto vazio.
-      return serialMatch ? serialMatch[1] || serialMatch[0] : "";
-    }
-
-    // Extrai horas no formato HH:MM ou H.MM de uma linha OCR.
-    function extractTimesFromLine(line) {
-      const matches = String(line).match(/\b([0-2]?[0-9])[:.hH]([0-5][0-9])\b/g) || [];
-
-      // Normaliza as horas para HH:MM.
-      return matches.map((value) => {
-        const parts = value.replace(/[hH.]/g, ":").split(":");
-        const hour = parts[0].padStart(2, "0");
-        const minute = parts[1].padStart(2, "0");
-        return `${hour}:${minute}`;
-      });
-    }
-
-    // Extrai números inteiros de uma linha OCR.
-    function extractNumbersFromLine(line) {
-      return String(line).match(/\b\d{1,4}\b/g) || [];
-    }
-
-    // Extrai códigos de estação com três ou quatro letras maiúsculas.
-    function extractStationCodesFromLine(line) {
-      const candidates = String(line).toUpperCase().match(/\b[A-Z]{3,4}\b/g) || [];
-
-      // Remove palavras frequentes que não são estações.
-      const blocked = new Set(["LOG", "PAX", "LEG", "ATA", "ATD", "BLK", "OFF", "ON", "NIL", "THE", "AND", "CREW"]);
-
-      // Filtra candidatos que parecem estações.
-      return candidates.filter((code) => !blocked.has(code));
-    }
-
-    // Tenta extrair legs a partir do texto OCR bruto.
-    function extractLegsHeuristically(text) {
-      const clean = normaliseText(text);
-      const lines = clean.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-      const extracted = [];
-
-      // Percorre cada linha para detectar conjuntos de dados que pareçam uma perna de voo.
-      for (const line of lines) {
-        const times = extractTimesFromLine(line);
-        const stations = extractStationCodesFromLine(line);
-        const numbers = extractNumbersFromLine(line);
-
-        // Considera uma linha como candidata quando há pelo menos duas estações ou duas horas.
-        const looksLikeLeg = stations.length >= 2 || times.length >= 2;
-
-        // Ignora linhas sem indícios suficientes.
-        if (!looksLikeLeg) {
-          continue;
-        }
-
-        // Cria uma leg com o que for possível extrair.
-        const leg = createEmptyLeg(extracted.length + 1);
-
-        // Preenche estações quando existirem.
-        leg.station_departure = stations[0] || "";
-        leg.station_arrival = stations[1] || "";
-
-        // Preenche horas pela ordem típica: off block, ATD, ATA, on block.
-        leg.off_blk = times[0] || "";
-        leg.atd = times[1] || "";
-        leg.ata = times[2] || "";
-        leg.on_blk = times[3] || "";
-
-        // Usa os primeiros três números maiores como possível fuel: refuel/depart/arrival.
-        const fuelNumbers = numbers.filter((n) => Number(n) >= 20 && Number(n) <= 5000);
-        leg.refuel = fuelNumbers[0] || "";
-        leg.depart = fuelNumbers[1] || "";
-        leg.arrival = fuelNumbers[2] || "";
-
-        // Tenta encontrar PAX em números pequenos.
-        const smallNumbers = numbers.filter((n) => Number(n) >= 0 && Number(n) <= 99);
-        leg.pax = smallNumbers[0] || "";
-        leg.trans = smallNumbers[1] || "";
-
-        // Guarda no máximo seis legs para evitar lixo OCR.
-        if (extracted.length < 6) {
-          extracted.push(leg);
-        }
-      }
-
-      return extracted;
-    }
-
-    // Desenha a tabela com base no array legs.
+    // Desenha a tabela a partir do array de legs.
     function renderLegsTable() {
       legsTableBody.innerHTML = "";
 
-      // Cria uma linha de tabela para cada leg.
+      // Cria uma linha para cada leg.
       legs.forEach((leg, index) => {
         const row = document.createElement("tr");
 
-        // Cria uma célula editável para cada campo.
+        // Cria um input para cada campo da leg.
         legFields.forEach((field) => {
           const cell = document.createElement("td");
           const input = document.createElement("input");
 
-          // Associa o input ao campo correspondente.
+          // Define o valor actual do campo.
           input.value = leg[field.key] ?? "";
           input.placeholder = field.placeholder;
           input.dataset.index = String(index);
           input.dataset.field = field.key;
 
-          // Actualiza o modelo de dados sempre que o utilizador edita.
+          // Actualiza o modelo de dados quando o utilizador edita a célula.
           input.addEventListener("input", (event) => {
             const rowIndex = Number(event.target.dataset.index);
             const key = event.target.dataset.field;
             legs[rowIndex][key] = event.target.value;
           });
 
+          // Adiciona o input à célula.
           cell.appendChild(input);
+
+          // Adiciona a célula à linha.
           row.appendChild(cell);
         });
 
-        // Cria botão para remover a leg.
+        // Cria a célula de acção para remover a leg.
         const actionCell = document.createElement("td");
         const removeButton = document.createElement("button");
+
+        // Configura o botão de remoção da leg.
         removeButton.textContent = "Remover";
         removeButton.className = "secondary";
         removeButton.type = "button";
 
-        // Remove a leg seleccionada e volta a desenhar a tabela.
+        // Remove a leg e actualiza select/tabela.
         removeButton.addEventListener("click", () => {
           legs.splice(index, 1);
           renderLegsTable();
+          populateTargetFieldOptions();
         });
 
+        // Adiciona o botão à célula de acção.
         actionCell.appendChild(removeButton);
+
+        // Adiciona a célula de acção à linha.
         row.appendChild(actionCell);
+
+        // Adiciona a linha ao corpo da tabela.
         legsTableBody.appendChild(row);
       });
     }
 
-    // Lê a fotografia seleccionada e mostra a pré-visualização.
+    // Carrega a fotografia escolhida pelo utilizador.
     photoInput.addEventListener("change", () => {
       const file = photoInput.files && photoInput.files[0];
 
-      // Sai se não houver ficheiro.
+      // Sai se o utilizador não escolheu ficheiro.
       if (!file) {
         return;
       }
 
-      // Usa FileReader para converter a imagem para data URL.
+      // Cria um FileReader para ler a imagem local.
       const reader = new FileReader();
 
-      // Quando a leitura termina, guarda e mostra a imagem.
+      // Quando a leitura termina, cria um objecto Image.
       reader.onload = () => {
-        currentImageDataUrl = reader.result;
-        preview.src = currentImageDataUrl;
-        preview.style.display = "block";
-        runOcrBtn.disabled = false;
-        setStatus("Imagem carregada. Podes iniciar a extracção por OCR.");
+        const img = new Image();
+
+        // Quando a imagem fica pronta, guarda e desenha no canvas.
+        img.onload = () => {
+          originalImage = img;
+          drawImageToCanvas();
+          ocrSelectionBtn.disabled = true;
+          ocrFullBtn.disabled = false;
+          clearSelectionBtn.disabled = true;
+          setStatus("Imagem carregada. Selecciona uma célula pequena e faz OCR da selecção.");
+        };
+
+        // Define a origem da imagem com o conteúdo carregado.
+        img.src = reader.result;
       };
 
-      // Inicia a leitura do ficheiro.
+      // Inicia a leitura do ficheiro como Data URL.
       reader.readAsDataURL(file);
     });
 
-    // Executa OCR com Tesseract.js sobre a fotografia carregada.
-    runOcrBtn.addEventListener("click", async () => {
-      if (!currentImageDataUrl) {
+    // Redesenha a imagem quando o zoom muda.
+    zoomLevel.addEventListener("change", () => {
+      if (!originalImage) {
+        return;
+      }
+
+      // Redesenha a imagem com a nova escala.
+      drawImageToCanvas();
+
+      // Limpa a selecção antiga porque as coordenadas mudaram.
+      clearSelection();
+    });
+
+    // Desenha a imagem original no canvas com escala ajustada.
+    function drawImageToCanvas() {
+      if (!originalImage) {
+        return;
+      }
+
+      // Lê a escala escolhida pelo utilizador.
+      currentScale = Number(zoomLevel.value || "1");
+
+      // Calcula o tamanho final do canvas.
+      const width = Math.round(originalImage.naturalWidth * currentScale);
+      const height = Math.round(originalImage.naturalHeight * currentScale);
+
+      // Define as dimensões internas do canvas.
+      imageCanvas.width = width;
+      imageCanvas.height = height;
+
+      // Define o tamanho visual do canvas.
+      imageCanvas.style.width = `${width}px`;
+      imageCanvas.style.height = `${height}px`;
+
+      // Limpa o canvas antes de desenhar.
+      ctx.clearRect(0, 0, width, height);
+
+      // Desenha a imagem escalada.
+      ctx.drawImage(originalImage, 0, 0, width, height);
+    }
+
+    // Obtém coordenadas do rato/toque relativas ao canvas.
+    function getCanvasPoint(event) {
+      const rect = imageCanvas.getBoundingClientRect();
+
+      // Usa o primeiro toque quando o evento vem do telemóvel.
+      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+      const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+
+      // Converte coordenadas visuais para coordenadas internas do canvas.
+      const x = (clientX - rect.left) * (imageCanvas.width / rect.width);
+      const y = (clientY - rect.top) * (imageCanvas.height / rect.height);
+
+      // Devolve ponto limitado aos limites do canvas.
+      return {
+        x: Math.max(0, Math.min(imageCanvas.width, x)),
+        y: Math.max(0, Math.min(imageCanvas.height, y))
+      };
+    }
+
+    // Inicia a selecção quando o utilizador pressiona no canvas.
+    function startSelection(event) {
+      if (!originalImage) {
+        return;
+      }
+
+      // Evita scroll durante a selecção no telemóvel.
+      event.preventDefault();
+
+      // Marca que a selecção está activa.
+      isSelecting = true;
+
+      // Guarda o ponto inicial.
+      selectionStart = getCanvasPoint(event);
+
+      // Define uma selecção inicial com tamanho zero.
+      selection = { x: selectionStart.x, y: selectionStart.y, width: 0, height: 0 };
+
+      // Mostra a caixa de selecção.
+      updateSelectionBox();
+    }
+
+    // Actualiza a selecção enquanto o utilizador arrasta.
+    function moveSelection(event) {
+      if (!isSelecting || !originalImage) {
+        return;
+      }
+
+      // Evita scroll durante a selecção no telemóvel.
+      event.preventDefault();
+
+      // Lê o ponto actual.
+      const point = getCanvasPoint(event);
+
+      // Calcula o rectângulo normalizado.
+      const x = Math.min(selectionStart.x, point.x);
+      const y = Math.min(selectionStart.y, point.y);
+      const width = Math.abs(point.x - selectionStart.x);
+      const height = Math.abs(point.y - selectionStart.y);
+
+      // Guarda a selecção actual.
+      selection = { x, y, width, height };
+
+      // Actualiza a caixa visual.
+      updateSelectionBox();
+    }
+
+    // Termina a selecção quando o utilizador larga o toque/rato.
+    function endSelection(event) {
+      if (!isSelecting) {
+        return;
+      }
+
+      // Evita comportamento padrão depois de seleccionar.
+      event.preventDefault();
+
+      // Marca que a selecção terminou.
+      isSelecting = false;
+
+      // Activa OCR se a selecção tiver tamanho útil.
+      if (selection && selection.width > 10 && selection.height > 10) {
+        ocrSelectionBtn.disabled = false;
+        clearSelectionBtn.disabled = false;
+        setStatus("Zona seleccionada. Escolhe o campo correcto e carrega em OCR da selecção.");
+      } else {
+        clearSelection();
+      }
+    }
+
+    // Regista eventos de rato para desktop.
+    imageCanvas.addEventListener("mousedown", startSelection);
+    imageCanvas.addEventListener("mousemove", moveSelection);
+    window.addEventListener("mouseup", endSelection);
+
+    // Regista eventos de toque para telemóvel.
+    imageCanvas.addEventListener("touchstart", startSelection, { passive: false });
+    imageCanvas.addEventListener("touchmove", moveSelection, { passive: false });
+    window.addEventListener("touchend", endSelection, { passive: false });
+
+    // Actualiza a posição visual da caixa de selecção.
+    function updateSelectionBox() {
+      if (!selection) {
+        selectionBox.style.display = "none";
+        return;
+      }
+
+      // Lê a posição do canvas e da área de imagem.
+      const canvasRect = imageCanvas.getBoundingClientRect();
+      const stageRect = imageStage.getBoundingClientRect();
+
+      // Calcula escala entre coordenadas internas e visuais.
+      const scaleX = canvasRect.width / imageCanvas.width;
+      const scaleY = canvasRect.height / imageCanvas.height;
+
+      // Define a posição visual da selecção.
+      const left = (canvasRect.left - stageRect.left + imageStage.scrollLeft) + selection.x * scaleX;
+      const top = (canvasRect.top - stageRect.top + imageStage.scrollTop) + selection.y * scaleY;
+      const width = selection.width * scaleX;
+      const height = selection.height * scaleY;
+
+      // Aplica estilos da caixa de selecção.
+      selectionBox.style.display = "block";
+      selectionBox.style.left = `${left}px`;
+      selectionBox.style.top = `${top}px`;
+      selectionBox.style.width = `${width}px`;
+      selectionBox.style.height = `${height}px`;
+    }
+
+    // Limpa a selecção actual.
+    function clearSelection() {
+      selection = null;
+      selectionBox.style.display = "none";
+      ocrSelectionBtn.disabled = true;
+      clearSelectionBtn.disabled = true;
+    }
+
+    // Liga o botão de limpar selecção.
+    clearSelectionBtn.addEventListener("click", () => {
+      clearSelection();
+      setStatus("Selecção limpa.");
+    });
+
+    // Cria uma imagem de canvas a partir da selecção actual.
+    function createCropCanvas() {
+      if (!selection || !originalImage) {
+        return null;
+      }
+
+      // Garante que a selecção tem dimensões úteis.
+      if (selection.width < 10 || selection.height < 10) {
+        return null;
+      }
+
+      // Cria um canvas temporário para o recorte.
+      const cropCanvas = document.createElement("canvas");
+
+      // Escala o recorte para melhorar OCR em escrita pequena.
+      const upscale = 3;
+
+      // Define o tamanho do recorte.
+      cropCanvas.width = Math.round(selection.width * upscale);
+      cropCanvas.height = Math.round(selection.height * upscale);
+
+      // Obtém o contexto do canvas temporário.
+      const cropCtx = cropCanvas.getContext("2d", { willReadFrequently: true });
+
+      // Desenha o recorte ampliado no canvas temporário.
+      cropCtx.drawImage(
+        imageCanvas,
+        selection.x,
+        selection.y,
+        selection.width,
+        selection.height,
+        0,
+        0,
+        cropCanvas.width,
+        cropCanvas.height
+      );
+
+      // Aplica pré-processamento conforme escolha do utilizador.
+      applyPreprocessing(cropCanvas, preprocessMode.value);
+
+      // Devolve o canvas recortado e processado.
+      return cropCanvas;
+    }
+
+    // Aplica grayscale, contraste e binarização ao canvas.
+    function applyPreprocessing(canvas, mode) {
+      if (mode === "none") {
+        return;
+      }
+
+      // Obtém o contexto 2D do canvas.
+      const localCtx = canvas.getContext("2d", { willReadFrequently: true });
+
+      // Lê todos os pixels da imagem.
+      const imageData = localCtx.getImageData(0, 0, canvas.width, canvas.height);
+
+      // Guarda o array de pixels.
+      const data = imageData.data;
+
+      // Define valores conforme intensidade escolhida.
+      const contrast = mode === "strong" ? 1.55 : 1.25;
+      const threshold = mode === "strong" ? 170 : 185;
+
+      // Percorre os pixels de quatro em quatro valores RGBA.
+      for (let i = 0; i < data.length; i += 4) {
+        // Calcula luminosidade aproximada do pixel.
+        let gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+
+        // Aplica contraste em torno do ponto médio 128.
+        gray = (gray - 128) * contrast + 128;
+
+        // Aplica binarização no modo forte.
+        if (mode === "strong") {
+          gray = gray > threshold ? 255 : 0;
+        }
+
+        // Limita valor entre 0 e 255.
+        gray = Math.max(0, Math.min(255, gray));
+
+        // Escreve o pixel em grayscale.
+        data[i] = gray;
+        data[i + 1] = gray;
+        data[i + 2] = gray;
+      }
+
+      // Coloca os pixels processados de volta no canvas.
+      localCtx.putImageData(imageData, 0, 0);
+    }
+
+    // Determina o tipo de OCR a usar com base no select e no campo escolhido.
+    function getEffectiveOcrKind() {
+      if (ocrMode.value !== "auto") {
+        return ocrMode.value;
+      }
+
+      // Obtém a opção seleccionada no campo destino.
+      const selectedOption = targetField.options[targetField.selectedIndex];
+
+      // Usa o tipo associado ao campo, quando existir.
+      return selectedOption ? selectedOption.dataset.kind || "text" : "text";
+    }
+
+    // Devolve uma whitelist de caracteres adequada ao tipo de campo.
+    function getWhitelist(kind) {
+      if (kind === "time") {
+        return "0123456789:.hH";
+      }
+
+      if (kind === "number") {
+        return "0123456789";
+      }
+
+      if (kind === "station") {
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+      }
+
+      return "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz:-/. ";
+    }
+
+    // Executa OCR num canvas específico.
+    async function runOcrOnCanvas(canvas, kind) {
+      // Converte o canvas para imagem PNG em memória.
+      const dataUrl = canvas.toDataURL("image/png");
+
+      // Executa Tesseract com whitelist adequada.
+      const result = await Tesseract.recognize(dataUrl, "eng+por", {
+        tessedit_char_whitelist: getWhitelist(kind),
+        logger: (message) => {
+          if (message.status && typeof message.progress === "number") {
+            const pct = Math.round(message.progress * 100);
+            setStatus(`${message.status}: ${pct}%`);
+          }
+        }
+      });
+
+      // Devolve o texto lido.
+      return result.data.text || "";
+    }
+
+    // Limpa e normaliza o texto OCR para um campo específico.
+    function cleanOcrValue(rawText, kind) {
+      const raw = String(rawText || "").trim();
+
+      // Para horas, procura HH:MM, H:MM ou H.MM.
+      if (kind === "time") {
+        const match = raw.match(/\b([0-2]?[0-9])[:.hH]([0-5][0-9])\b/);
+        if (!match) {
+          return raw.replace(/\s+/g, "");
+        }
+
+        // Normaliza a hora para HH:MM.
+        const hour = match[1].padStart(2, "0");
+        const minute = match[2].padStart(2, "0");
+        return `${hour}:${minute}`;
+      }
+
+      // Para números, remove tudo o que não for dígito.
+      if (kind === "number") {
+        const digits = raw.replace(/\D+/g, "");
+        return digits;
+      }
+
+      // Para estações, deixa só letras e usa maiúsculas.
+      if (kind === "station") {
+        const letters = raw.replace(/[^A-Za-z]/g, "").toUpperCase();
+        return letters.slice(0, 4);
+      }
+
+      // Para texto, remove quebras e espaços duplicados.
+      return raw.replace(/\s+/g, " ").trim().toUpperCase();
+    }
+
+    // Aplica um valor limpo ao campo escolhido.
+    function applyValueToTarget(value) {
+      const key = targetField.value;
+
+      // Trata o campo global do serial number.
+      if (key === "technical_log_serial_number") {
+        technicalLogSerialNumber.value = value;
+        return;
+      }
+
+      // Divide a chave no formato leg_INDEX_FIELD.
+      const parts = key.split("_");
+
+      // Lê o índice da leg.
+      const legIndex = Number(parts[1]);
+
+      // Reconstrói o nome do campo, que pode ter underscores.
+      const fieldKey = parts.slice(2).join("_");
+
+      // Garante que a leg existe.
+      if (!legs[legIndex]) {
+        return;
+      }
+
+      // Aplica o valor ao modelo de dados.
+      legs[legIndex][fieldKey] = value;
+
+      // Redesenha a tabela para mostrar o valor.
+      renderLegsTable();
+
+      // Recria opções para manter labels coerentes.
+      populateTargetFieldOptions();
+
+      // Repõe o target anterior se ainda existir.
+      targetField.value = key;
+    }
+
+    // Executa OCR apenas na zona seleccionada.
+    ocrSelectionBtn.addEventListener("click", async () => {
+      const cropCanvas = createCropCanvas();
+
+      // Sai se não houver selecção válida.
+      if (!cropCanvas) {
+        setStatus("Selecciona primeiro uma zona válida.", true);
+        return;
+      }
+
+      // Obtém o tipo de OCR efectivo.
+      const kind = getEffectiveOcrKind();
+
+      // Desactiva o botão durante o OCR.
+      ocrSelectionBtn.disabled = true;
+      setStatus("OCR da selecção em curso...");
+
+      try {
+        // Executa o OCR na imagem recortada.
+        const raw = await runOcrOnCanvas(cropCanvas, kind);
+
+        // Guarda texto bruto para auditoria.
+        ocrText.value = raw;
+
+        // Limpa o valor para o campo escolhido.
+        const clean = cleanOcrValue(raw, kind);
+
+        // Aplica o valor ao campo escolhido.
+        applyValueToTarget(clean);
+
+        // Mostra estado final.
+        setStatus(`Valor aplicado: ${clean || "(vazio)"}`);
+      } catch (error) {
+        console.error(error);
+        setStatus("Erro no OCR da selecção. Tenta uma zona mais pequena ou muda o pré-processamento.", true);
+      } finally {
+        // Reactiva o botão se a selecção continuar válida.
+        ocrSelectionBtn.disabled = !selection;
+      }
+    });
+
+    // Executa OCR na folha inteira apenas para referência.
+    ocrFullBtn.addEventListener("click", async () => {
+      if (!originalImage) {
         setStatus("Carrega primeiro uma fotografia.", true);
         return;
       }
 
-      // Desactiva o botão para evitar execuções duplicadas.
-      runOcrBtn.disabled = true;
-      setStatus("OCR em curso. Isto pode demorar alguns segundos no telemóvel...");
+      // Desactiva o botão durante o OCR.
+      ocrFullBtn.disabled = true;
+      setStatus("OCR da folha inteira em curso. Pode gerar muito ruído...");
 
       try {
-        // Executa o OCR em português e inglês para lidar com formulário misto.
-        const result = await Tesseract.recognize(currentImageDataUrl, "eng+por", {
-          logger: (message) => {
-            // Mostra progresso aproximado ao utilizador.
-            if (message.status && typeof message.progress === "number") {
-              const pct = Math.round(message.progress * 100);
-              setStatus(`${message.status}: ${pct}%`);
-            }
-          }
-        });
+        // Cria um canvas temporário com a imagem completa.
+        const fullCanvas = document.createElement("canvas");
 
-        // Coloca o texto lido na textarea.
-        ocrText.value = result.data.text || "";
+        // Define escala moderada para OCR global.
+        const scale = 1.5;
 
-        // Aplica heurísticas automaticamente depois da OCR.
-        applyHeuristics();
+        // Define tamanho do canvas temporário.
+        fullCanvas.width = Math.round(originalImage.naturalWidth * scale);
+        fullCanvas.height = Math.round(originalImage.naturalHeight * scale);
 
-        // Informa o utilizador de que deve confirmar os campos.
-        setStatus("OCR concluída. Confirma os campos antes de gerar o JSON.");
+        // Desenha a imagem no canvas temporário.
+        const fullCtx = fullCanvas.getContext("2d", { willReadFrequently: true });
+        fullCtx.drawImage(originalImage, 0, 0, fullCanvas.width, fullCanvas.height);
+
+        // Aplica pré-processamento médio para folha inteira.
+        applyPreprocessing(fullCanvas, "medium");
+
+        // Executa OCR como texto geral.
+        const raw = await runOcrOnCanvas(fullCanvas, "text");
+
+        // Mostra texto bruto.
+        ocrText.value = raw;
+
+        // Tenta encontrar serial number a partir do texto global.
+        const serial = findSerialInText(raw);
+
+        // Preenche serial se for detectado.
+        if (serial) {
+          technicalLogSerialNumber.value = serial;
+        }
+
+        // Mostra conclusão.
+        setStatus("OCR da folha inteira concluída. Usa-a só como apoio; confirma manualmente.");
       } catch (error) {
         console.error(error);
-        setStatus("Erro ao executar OCR. Confirma a ligação à internet na primeira utilização e tenta novamente.", true);
+        setStatus("Erro no OCR da folha inteira.", true);
       } finally {
-        // Reactiva o botão depois do processo terminar.
-        runOcrBtn.disabled = false;
+        // Reactiva o botão após OCR.
+        ocrFullBtn.disabled = false;
       }
     });
 
-    // Aplica heurísticas ao texto OCR e preenche campos quando possível.
-    function applyHeuristics() {
-      const text = ocrText.value;
+    // Procura um possível serial number no texto OCR.
+    function findSerialInText(text) {
+      const clean = String(text || "").replace(/\s+/g, " ");
 
-      // Extrai o serial number da folha.
-      const serial = extractTechnicalLogSerial(text);
-      if (serial) {
-        technicalLogSerialNumber.value = serial;
+      // Procura primeiro junto de palavras relevantes.
+      const contextual =
+        clean.match(/serial\s*number[^0-9]{0,30}([0-9]{3,6})/i) ||
+        clean.match(/technical\s*log[^0-9]{0,40}([0-9]{3,6})/i);
+
+      // Devolve valor contextual quando existe.
+      if (contextual) {
+        return contextual[1];
       }
 
-      // Tenta extrair legs do texto.
-      const extractedLegs = extractLegsHeuristically(text);
+      // Como fallback, procura número de 4 a 6 dígitos iniciado por zero.
+      const fallback = clean.match(/\b0[0-9]{3,5}\b/);
 
-      // Só substitui a tabela se houver dados minimamente plausíveis.
-      if (extractedLegs.length > 0) {
-        legs.splice(0, legs.length, ...extractedLegs);
-        renderLegsTable();
-      }
+      // Devolve fallback ou vazio.
+      return fallback ? fallback[0] : "";
     }
 
-    // Permite aplicar heurísticas manualmente após editar o texto OCR.
-    parseBtn.addEventListener("click", () => {
-      applyHeuristics();
-      setStatus("Heurísticas aplicadas. Confirma a tabela manualmente.");
+    // Aplica manualmente o texto OCR ao campo seleccionado.
+    applyTextBtn.addEventListener("click", () => {
+      const kind = getEffectiveOcrKind();
+      const clean = cleanOcrValue(ocrText.value, kind);
+      applyValueToTarget(clean);
+      setStatus(`Texto aplicado ao campo escolhido: ${clean || "(vazio)"}`);
     });
 
-    // Adiciona uma nova leg vazia no fim da tabela.
+    // Limpa a caixa de texto OCR.
+    cleanTextBtn.addEventListener("click", () => {
+      ocrText.value = "";
+      setStatus("Texto OCR limpo.");
+    });
+
+    // Adiciona uma nova leg vazia.
     addLegBtn.addEventListener("click", () => {
       legs.push(createEmptyLeg(legs.length + 1));
       renderLegsTable();
+      populateTargetFieldOptions();
+      setStatus("Nova leg adicionada.");
     });
 
-    // Limpa a app para começar uma nova folha.
-    clearBtn.addEventListener("click", () => {
-      currentImageDataUrl = null;
+    // Limpa todos os dados da app.
+    clearAllBtn.addEventListener("click", () => {
+      // Limpa imagem e input de ficheiro.
+      originalImage = null;
       photoInput.value = "";
-      preview.removeAttribute("src");
-      preview.style.display = "none";
-      runOcrBtn.disabled = true;
+
+      // Limpa canvas.
+      imageCanvas.width = 0;
+      imageCanvas.height = 0;
+
+      // Limpa selecção.
+      clearSelection();
+
+      // Limpa OCR e dados gerais.
       ocrText.value = "";
       technicalLogSerialNumber.value = "";
+
+      // Repõe quatro legs vazias.
       legs.splice(0, legs.length, createEmptyLeg(1), createEmptyLeg(2), createEmptyLeg(3), createEmptyLeg(4));
+
+      // Redesenha interface.
       renderLegsTable();
+      populateTargetFieldOptions();
+
+      // Limpa JSON.
       jsonOutput.textContent = "{}";
+
+      // Desactiva botões que dependem de dados.
+      ocrFullBtn.disabled = true;
       copyJsonBtn.disabled = true;
       downloadJsonBtn.disabled = true;
-      setStatus("");
+
+      // Mostra estado final.
+      setStatus("Tudo limpo.");
     });
 
-    // Constrói o JSON final a partir dos campos confirmados.
+    // Constrói o payload final para JSON.
     function buildPayload() {
       return {
         technical_log_serial_number: emptyToNull(technicalLogSerialNumber.value),
@@ -729,42 +1295,51 @@
       };
     }
 
-    // Gera o JSON final depois da confirmação visual.
+    // Gera o JSON final após confirmação manual.
     generateJsonBtn.addEventListener("click", () => {
+      // Constrói o objecto final.
       const payload = buildPayload();
+
+      // Converte para JSON formatado.
       const json = JSON.stringify(payload, null, 2);
 
-      // Mostra o JSON na interface.
+      // Mostra o JSON no ecrã.
       jsonOutput.textContent = json;
 
       // Activa botões de cópia e download.
       copyJsonBtn.disabled = false;
       downloadJsonBtn.disabled = false;
 
-      // Prepara o ficheiro JSON para download.
+      // Remove URL antigo quando existe.
       if (currentJsonBlobUrl) {
         URL.revokeObjectURL(currentJsonBlobUrl);
       }
 
-      // Cria um Blob com o JSON final.
+      // Cria um Blob com o JSON.
       const blob = new Blob([json], { type: "application/json" });
+
+      // Cria URL local para download.
       currentJsonBlobUrl = URL.createObjectURL(blob);
 
-      setStatus("JSON gerado. Podes copiar ou descarregar.");
+      // Mostra estado final.
+      setStatus("JSON gerado. Confirma antes de usar em integração LEON.");
     });
 
-    // Copia o JSON final para o clipboard.
+    // Copia o JSON final para a área de transferência.
     copyJsonBtn.addEventListener("click", async () => {
       try {
+        // Usa a API Clipboard do browser.
         await navigator.clipboard.writeText(jsonOutput.textContent);
-        setStatus("JSON copiado para a área de transferência.");
+
+        // Confirma cópia.
+        setStatus("JSON copiado.");
       } catch (error) {
         console.error(error);
-        setStatus("Não foi possível copiar automaticamente. Selecciona o JSON manualmente.", true);
+        setStatus("Não foi possível copiar automaticamente. Copia manualmente o texto.", true);
       }
     });
 
-    // Descarrega o JSON final como ficheiro local.
+    // Descarrega o JSON final como ficheiro.
     downloadJsonBtn.addEventListener("click", () => {
       if (!currentJsonBlobUrl) {
         return;
@@ -772,14 +1347,23 @@
 
       // Usa o serial number no nome do ficheiro quando existir.
       const serial = technicalLogSerialNumber.value.trim() || "sem-serial";
-      const filename = `atl-${serial}.json`;
 
-      // Cria uma âncora temporária para iniciar o download.
+      // Cria uma âncora temporária.
       const link = document.createElement("a");
+
+      // Define o URL do ficheiro.
       link.href = currentJsonBlobUrl;
-      link.download = filename;
+
+      // Define o nome do ficheiro.
+      link.download = `atl-${serial}.json`;
+
+      // Adiciona a âncora ao DOM.
       document.body.appendChild(link);
+
+      // Simula clique para iniciar download.
       link.click();
+
+      // Remove a âncora temporária.
       link.remove();
     });
   </script>

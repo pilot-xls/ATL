@@ -1,8 +1,9 @@
 {
-  "name": "ATL Extractor V1",
-  "short_name": "ATL V1",
-  "description": "PWA para extrair dados básicos de Aircraft Technical Log e gerar JSON.",
-  "start_url": "./",
+  "name": "ATL Extractor V1.1",
+  "short_name": "ATL V1.1",
+  "description": "PWA para extrair dados básicos de Aircraft Technical Log com OCR por zona e gerar JSON.",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f3f4f6",
   "theme_color": "#111827",
