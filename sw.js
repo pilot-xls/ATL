@@ -1,5 +1,5 @@
 // Define o nome da cache desta versão da PWA.
-const CACHE_NAME = "atl-extractor-v1";
+const CACHE_NAME = "atl-extractor-v2";
 
 // Lista os ficheiros locais que devem ficar em cache.
 const LOCAL_ASSETS = [
